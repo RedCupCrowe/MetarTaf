@@ -6,7 +6,7 @@
 @implements IDisposable
 @rendermode InteractiveServer
 
-<h3>Weather Information for @airport?.Info?.Name (@airport?.Icao)</h3>
+<h3>Weather Information for @airport?.Info?.name (@airport?.Icao)</h3>
 
 @if (airport?.Info != null)
 {
@@ -15,14 +15,14 @@
             Airport Information
         </div>
         <div class="card-body">
-            <p><strong>Name:</strong> @airport.Info.Name</p>
-            <p><strong>City:</strong> @airport.Info.City</p>
-            <p><strong>Country:</strong> @airport.Info.Country</p>
-            <p><strong>Elevation:</strong> @airport.Info.ElevationFt ft / @airport.Info.ElevationM m</p>
-            <p><strong>Latitude:</strong> @airport.Info.Latitude</p>
-            <p><strong>Longitude:</strong> @airport.Info.Longitude</p>
-            <p><strong>Website:</strong> <a href="@airport.Info.Website" target="_blank">@airport.Info.Website</a></p>
-            <p><strong>Wiki:</strong> <a href="@airport.Info.Wiki" target="_blank">@airport.Info.Wiki</a></p>
+            <p><strong>Name:</strong> @airport.Info.name</p>
+            <p><strong>City:</strong> @airport.Info.city</p>
+            <p><strong>Country:</strong> @airport.Info.country</p>
+            <p><strong>Elevation:</strong> @airport.Info.elevation_ft ft / @airport.Info.elevation_m m</p>
+            <p><strong>Latitude:</strong> @airport.Info.latitude</p>
+            <p><strong>Longitude:</strong> @airport.Info.longitude</p>
+            <p><strong>Website:</strong> <a href="@airport.Info.website" target="_blank">@airport.Info.website</a></p>
+            <p><strong>Wiki:</strong> <a href="@airport.Info.wiki" target="_blank">@airport.Info.wiki</a></p>
         </div>
     </div>
 }

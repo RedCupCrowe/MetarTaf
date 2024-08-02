@@ -5,31 +5,31 @@ namespace MetarTaf.Components.Models
 {
     public class AirportInfo
     {
-        public string City { get; set; }
-        public string Country { get; set; }
-        public int ElevationFt { get; set; }
-        public int ElevationM { get; set; }
-        public string Gps { get; set; }
-        public string Iata { get; set; }
-        public string Icao { get; set; }
-        public double Latitude { get; set; }
-        public string Local { get; set; }
-        public double Longitude { get; set; }
-        public string Name { get; set; }
-        public string Note { get; set; }
-        public bool Reporting { get; set; }
-        public List<Runway> Runways { get; set; }
-        public string State { get; set; }
-        public string Type { get; set; }
-        public string Website { get; set; }
-        public string Wiki { get; set; }
+        public string city { get; set; }
+        public string country { get; set; }
+        public int elevation_ft { get; set; }
+        public int elevation_m { get; set; }
+        public string gps { get; set; }
+        public string iata { get; set; }
+        public string icao { get; set; }
+        public double latitude { get; set; }
+        public string local { get; set; }
+        public double longitude { get; set; }
+        public string name { get; set; }
+        public string note { get; set; }
+        public bool reporting { get; set; }
+        public List<Runway> runways { get; set; }
+        public string state { get; set; }
+        public string type { get; set; }
+        public string website { get; set; }
+        public string wiki { get; set; }
     }
 
     public class Runway
     {
-        public int LengthFt { get; set; }
-        public int WidthFt { get; set; }
-        public string Ident1 { get; set; }
-        public string Ident2 { get; set; }
+        public int length_ft { get; set; }
+        public int width_ft { get; set; }
+        public string ident1 { get; set; }
+        public string ident2 { get; set; }
     }
 }
