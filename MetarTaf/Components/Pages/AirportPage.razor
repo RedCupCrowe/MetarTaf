@@ -1,0 +1,137 @@
+﻿@page "/airport/{icao}"
+@using MetarTaf.Components.Services
+@using MetarTaf.Components.Models
+@inject MetarService MetarService
+@inject AirportInfoService AirportInfoService
+@implements IDisposable
+@rendermode InteractiveServer
+
+<h3>Weather Information for @airport?.Info?.Name (@airport?.Icao)</h3>
+
+@if (airport?.Info != null)
+{
+    <div class="card">
+        <div class="card-header">
+            Airport Information
+        </div>
+        <div class="card-body">
+            <p><strong>Name:</strong> @airport.Info.Name</p>
+            <p><strong>City:</strong> @airport.Info.City</p>
+            <p><strong>Country:</strong> @airport.Info.Country</p>
+            <p><strong>Elevation:</strong> @airport.Info.ElevationFt ft / @airport.Info.ElevationM m</p>
+            <p><strong>Latitude:</strong> @airport.Info.Latitude</p>
+            <p><strong>Longitude:</strong> @airport.Info.Longitude</p>
+            <p><strong>Website:</strong> <a href="@airport.Info.Website" target="_blank">@airport.Info.Website</a></p>
+            <p><strong>Wiki:</strong> <a href="@airport.Info.Wiki" target="_blank">@airport.Info.Wiki</a></p>
+        </div>
+    </div>
+}
+
+@if (airport?.Metars != null && airport.Metars.Count > 0)
+{
+    <div class="card mt-3">
+        <div class="card-header">
+            METAR Data for @airport.Icao
+        </div>
+
+        <div class="card-body">
+            <button class="btn btn-primary" @onclick="FetchMetarAsync">Refresh</button>
+            <div class="mt-2">
+                Last updated: @(airport.LastUpdated.HasValue ? airport.LastUpdated.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss") : "Never")
+            </div>
+
+            <table class="table mt-3">
+                <thead>
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Time</th>
+                        <th scope="col">Raw METAR</th>
+                        <th scope="col">Flight Rules</th>
+                        <th scope="col">Temperature</th>
+                        <th scope="col">Dewpoint</th>
+                        <th scope="col">Visibility</th>
+                        <th scope="col">Wind Direction</th>
+                        <th scope="col">Wind Speed</th>
+                        <th scope="col">Altimeter</th>
+                        <th scope="col">Clouds</th>
+                        <th scope="col">Remarks</th>
+                        <th scope="col">Dewpoint Decimal</th>
+                        <th scope="col">Temperature Decimal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var metarEntry in airport.Metars.OrderByDescending(m => m.Key))
+                    {
+                        var metar = metarEntry.Value;
+                        <tr>
+                            <td>@(metar.Time?.Dt.ToLocalTime().ToString("yyyy-MM-dd") ?? "Null")</td>
+                            <td>@(metar.Time?.Dt.ToLocalTime().ToString("HH:mm:ss") ?? "Null")</td>
+                            <td>@(metar.Raw ?? "Null")</td>
+                            <td>@(metar.FlightRules ?? "Null")</td>
+                            <td>@(metar.Temperature?.Value.ToString() ?? "Null") @metar.Units?.Temperature</td>
+                            <td>@(metar.Dewpoint?.Value.ToString() ?? "Null") @metar.Units?.Temperature</td>
+                            <td>@(metar.Visibility?.Value.ToString() ?? "Null") @metar.Units?.Visibility</td>
+                            <td>@(metar.WindDirection?.Value.ToString() ?? "Null")</td>
+                            <td>@(metar.WindSpeed?.Value.ToString() ?? "Null") @metar.Units?.WindSpeed</td>
+                            <td>@(metar.Altimeter?.Value.ToString() ?? "Null") @metar.Units?.Altimeter</td>
+                            <td>
+                                @if (metar.Clouds != null && metar.Clouds.Count > 0)
+                                {
+                                    @foreach (var cloud in metar.Clouds)
+                                    {
+                                        <div>@cloud.Repr</div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div>Null</div>
+                                }
+                            </td>
+                            <td>@(metar.Remarks ?? "Null")</td>
+                            <td>@(metar.RemarksInfo?.DewpointDecimal?.ToString() ?? "Null")</td>
+                            <td>@(metar.RemarksInfo?.TemperatureDecimal?.ToString() ?? "Null")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else if (airport?.Error != null)
+{
+    <p>@airport.Error</p>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    [Parameter] public string? icao { get; set; }
+
+    private Airport? airport;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(icao))
+        {
+            airport = new Airport(icao, MetarService, AirportInfoService); // Replace with actual airport name if available
+            airport.OnStateChanged = StateHasChanged; // Subscribe to state change notification
+            await airport.InitializeAsync();
+        }
+    }
+
+    private async Task FetchMetarAsync()
+    {
+        if (airport != null)
+        {
+            Console.WriteLine("Manual FetchMetarAsync() invoked");
+            await airport.FetchMetarAsync();
+        }
+    }
+
+    public void Dispose()
+    {
+        airport?.Dispose();
+    }
+}
