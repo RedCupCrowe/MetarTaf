@@ -6,6 +6,8 @@
 @implements IDisposable
 @rendermode InteractiveServer
 
+<PageTitle>@icao - @airport?.Info?.name</PageTitle>
+
 <h3>Weather Information for @airport?.Info?.name (@airport?.Icao)</h3>
 
 @if (airport?.Info != null)
