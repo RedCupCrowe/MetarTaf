@@ -62,7 +62,7 @@ namespace MetarTaf.Components.Models
         {
             await FetchMetarAsync();
             await FetchAirportInfoAsync();
-            timer = new Timer(async _ => await TimerCallback(), null, TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(5));
+            timer = new Timer(async _ => await TimerCallback(), null, TimeSpan.FromMinutes(2), TimeSpan.FromMinutes(2));
         }
 
         private async Task TimerCallback()

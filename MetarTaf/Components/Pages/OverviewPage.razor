@@ -1,0 +1,154 @@
+﻿@page "/Overview"
+@using MetarTaf.Components.Models
+@using MetarTaf.Components.Services
+@using Microsoft.AspNetCore.Components.Web.Extensions
+@using System.Text.Json
+@implements IDisposable
+@rendermode InteractiveServer
+
+<PageTitle>Airport overview</PageTitle>
+
+<h1 id="header1">Martins lorte applikation</h1>
+
+<div>
+    <p>Current time: @currentTime.ToString("yyyy-MM-dd HH:mm:ss")</p>
+</div>
+
+<div>
+    <input @bind="newIcao" placeholder="Enter ICAO code" />
+    <button @onclick="AddAirport">Add Airport</button>
+</div>
+
+@foreach (var airportEntry in airports)
+{
+    var airport = airportEntry.Value;
+    var latestMetar = airport.Metars.OrderByDescending(m => m.Key).FirstOrDefault().Value;
+    if (latestMetar != null)
+    {
+        var metarTime = latestMetar.Time?.Dt ?? DateTime.MinValue;
+        var timeSinceLastMetar = currentTime - metarTime;
+        <div>
+            <h2>@airport.Icao</h2>
+            <button @onclick="() => RemoveAirport(airport.Icao)">Delete</button>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Station</th>
+                        <th>Reports</th>
+                        <th>AMD/SPECi</th>
+                        <th>Report type</th>
+                        <th>Raw report</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="2">@airport.Icao</td>
+                        <td>TAF: NOT IMPLEMENTED YET (TimeSinceLastTAF)</td>
+                        <td>AMD</td>
+                        <td>TAF</td>
+                        <td>NOT IMPLEMENTED YET</td>
+                    </tr>
+                    <tr>
+                        <td>METAR: @metarTime.ToString("HH:mm") (@timeSinceLastMetar.ToString("hh\\:mm"))</td>
+                        <td>SPECi</td>
+                        <td>METAR</td>
+                        <td>@latestMetar.Raw</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    }
+}
+
+@code {
+    private DateTime currentTime;
+    private Timer? timer;
+    private string newIcao = string.Empty;
+    private Dictionary<string, Airport> airports = new();
+    private bool isInitialized = false;
+
+    [Inject] private MetarService MetarService { get; set; }
+    [Inject] private AirportInfoService AirportInfoService { get; set; }
+    [Inject] private IJSRuntime JSRuntime { get; set; }
+
+    private const string AirportsStorageKey = "airports";
+
+    protected override void OnInitialized()
+    {
+        currentTime = DateTime.UtcNow;
+        timer = new Timer(UpdateCurrentTime, null, 0, 1000); // Update every second
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !isInitialized)
+        {
+            await LoadAirportsFromLocalStorage();
+            isInitialized = true;
+            StateHasChanged();
+        }
+    }
+
+    private void UpdateCurrentTime(object? state)
+    {
+        currentTime = DateTime.UtcNow;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async Task AddAirport()
+    {
+        if (!string.IsNullOrEmpty(newIcao) && !airports.ContainsKey(newIcao))
+        {
+            var airport = new Airport(newIcao, MetarService, AirportInfoService);
+            airports[newIcao] = airport;
+            await airport.InitializeAsync();
+            await SaveAirportsToLocalStorage();
+            StateHasChanged();
+        }
+    }
+
+    private async Task RemoveAirport(string icao)
+    {
+        if (airports.ContainsKey(icao))
+        {
+            airports[icao].Dispose();
+            airports.Remove(icao);
+            await SaveAirportsToLocalStorage();
+            StateHasChanged();
+        }
+    }
+
+    private async Task SaveAirportsToLocalStorage()
+    {
+        var icaoList = airports.Keys.ToList();
+        await JSRuntime.InvokeVoidAsync("localStorage.setItem", AirportsStorageKey, JsonSerializer.Serialize(icaoList));
+    }
+
+    private async Task LoadAirportsFromLocalStorage()
+    {
+        var icaoListJson = await JSRuntime.InvokeAsync<string>("localStorage.getItem", AirportsStorageKey);
+        if (!string.IsNullOrEmpty(icaoListJson))
+        {
+            var icaoList = JsonSerializer.Deserialize<List<string>>(icaoListJson);
+            if (icaoList != null)
+            {
+                foreach (var icao in icaoList)
+                {
+                    var airport = new Airport(icao, MetarService, AirportInfoService);
+                    airports[icao] = airport;
+                    await airport.InitializeAsync();
+                }
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        timer?.Dispose();
+        foreach (var airport in airports.Values)
+        {
+            airport.Dispose();
+        }
+    }
+}
+
