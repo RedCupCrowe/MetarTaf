@@ -6,6 +6,8 @@
 @implements IDisposable
 @rendermode InteractiveServer
 
+@inject NavigationManager Navigation
+
 <PageTitle>Airport overview</PageTitle>
 
 <h1 id="header1">Martins lorte applikation</h1>
@@ -30,6 +32,7 @@
         <div>
             <h2>@airport.Icao</h2>
             <button @onclick="() => RemoveAirport(airport.Icao)">Delete</button>
+            <button @onclick="() => NavigateToAirportPage(airport.Icao)">Airport page</button>
             <table class="table">
                 <thead>
                     <tr>
@@ -44,13 +47,13 @@
                     <tr>
                         <td rowspan="2">@airport.Icao</td>
                         <td>TAF: NOT IMPLEMENTED YET (TimeSinceLastTAF)</td>
-                        <td>AMD</td>
+                        <td>(WIP)</td>
                         <td>TAF</td>
                         <td>NOT IMPLEMENTED YET</td>
                     </tr>
                     <tr>
                         <td>METAR: @metarTime.ToString("HH:mm") (@timeSinceLastMetar.ToString("hh\\:mm"))</td>
-                        <td>SPECi</td>
+                        <td>(WIP)</td>
                         <td>METAR</td>
                         <td>@latestMetar.Raw</td>
                     </tr>
@@ -142,6 +145,11 @@
         }
     }
 
+    private void NavigateToAirportPage(string icao)
+    {
+        Navigation.NavigateTo($"/Airport/{icao}");
+    }
+
     public void Dispose()
     {
         timer?.Dispose();
@@ -151,4 +159,3 @@
         }
     }
 }
-
