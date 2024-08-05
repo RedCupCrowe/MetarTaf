@@ -25,41 +25,54 @@
 {
     var airport = airportEntry.Value;
     var latestMetar = airport.Metars.OrderByDescending(m => m.Key).FirstOrDefault().Value;
+    var latestTaf = airport.Tafs.OrderByDescending(t => t.Key).FirstOrDefault().Value;
+
     if (latestMetar != null)
     {
         var metarTime = latestMetar.Time?.Dt ?? DateTime.MinValue;
         var timeSinceLastMetar = currentTime - metarTime;
-        <div>
-            <h2>@airport.Icao</h2>
-            <button @onclick="() => RemoveAirport(airport.Icao)">Delete</button>
-            <button @onclick="() => NavigateToAirportPage(airport.Icao)">Airport page</button>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Station</th>
-                        <th>Reports</th>
-                        <th>AMD/SPECi</th>
-                        <th>Report type</th>
-                        <th>Raw report</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td rowspan="2">@airport.Icao</td>
-                        <td>TAF: NOT IMPLEMENTED YET (TimeSinceLastTAF)</td>
-                        <td>(WIP)</td>
-                        <td>TAF</td>
-                        <td>NOT IMPLEMENTED YET</td>
-                    </tr>
-                    <tr>
-                        <td>METAR: @metarTime.ToString("HH:mm") (@timeSinceLastMetar.ToString("hh\\:mm"))</td>
-                        <td>(WIP)</td>
-                        <td>METAR</td>
-                        <td>@latestMetar.Raw</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+
+        if(latestTaf != null)
+        {
+            var tafTime = latestTaf.time?.dt ?? DateTime.MinValue;
+            var timeSinceLastTAF = currentTime - tafTime;
+
+
+            <div>
+                <h2>@airport.Icao</h2>
+                <button @onclick="() => RemoveAirport(airport.Icao)">Delete</button>
+                <button @onclick="() => NavigateToAirportPage(airport.Icao)">Airport page</button>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Station</th>
+                            <th>Reports</th>
+                            <th>AMD/SPECi</th>
+                            <th>Report type</th>
+                            <th>Raw report</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td rowspan="2">@airport.Icao</td>
+                            <td>TAF: @tafTime.ToString("HH:mm") (@timeSinceLastTAF.ToString("hh\\:mm"))</td>
+                            <td>(WIP)</td>
+                            <td>TAF</td>
+                            <td>@latestTaf.raw</td>
+                        </tr>
+                        <tr>
+                            <td>METAR: @metarTime.ToString("HH:mm") (@timeSinceLastMetar.ToString("hh\\:mm"))</td>
+                            <td>(WIP)</td>
+                            <td>METAR</td>
+                            <td>@latestMetar.Raw</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            
+        }
+
     }
 }
 
@@ -71,6 +84,7 @@
     private bool isInitialized = false;
 
     [Inject] private MetarService MetarService { get; set; }
+    [Inject] private TAFService tafService { get; set; }
     [Inject] private AirportInfoService AirportInfoService { get; set; }
     [Inject] private IJSRuntime JSRuntime { get; set; }
 
@@ -102,7 +116,7 @@
     {
         if (!string.IsNullOrEmpty(newIcao) && !airports.ContainsKey(newIcao))
         {
-            var airport = new Airport(newIcao, MetarService, AirportInfoService);
+            var airport = new Airport(newIcao, MetarService, tafService, AirportInfoService);
             airports[newIcao] = airport;
             await airport.InitializeAsync();
             await SaveAirportsToLocalStorage();
@@ -137,7 +151,7 @@
             {
                 foreach (var icao in icaoList)
                 {
-                    var airport = new Airport(icao, MetarService, AirportInfoService);
+                    var airport = new Airport(icao, MetarService, tafService, AirportInfoService);
                     airports[icao] = airport;
                     await airport.InitializeAsync();
                 }
