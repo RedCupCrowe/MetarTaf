@@ -3,12 +3,15 @@ using MetarTaf.Components.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
+string apiKey = "pp7LF-kDXnpRRq6vGPtDO7Dij_7fAJuN3w9HpQtInYA";
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
-    .Services.AddSingleton(new MetarService(new HttpClient(), "pp7LF-kDXnpRRq6vGPtDO7Dij_7fAJuN3w9HpQtInYA"))
-    .AddSingleton(new AirportInfoService(new HttpClient(), "pp7LF-kDXnpRRq6vGPtDO7Dij_7fAJuN3w9HpQtInYA"));
+    .Services
+    .AddSingleton(new MetarService(new HttpClient(), apiKey))
+    .AddSingleton(new TAFService(new HttpClient(), apiKey))
+    .AddSingleton(new AirportInfoService(new HttpClient(), apiKey));
 
 var app = builder.Build();
 
