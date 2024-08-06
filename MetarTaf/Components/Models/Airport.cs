@@ -87,9 +87,9 @@ namespace MetarTaf.Components.Models
 
         public async Task InitializeAsync()
         {
+            await FetchAirportInfoAsync();
             await FetchMetarAsync();
             await FetchTafAsync();
-            await FetchAirportInfoAsync();
             timer = new Timer(async _ => await TimerCallback(), null, TimeSpan.FromMinutes(2), TimeSpan.FromMinutes(2));
         }
 
@@ -120,6 +120,7 @@ namespace MetarTaf.Components.Models
                 SaveMetars();
                 NotifyStateChanged();
             }
+
             catch (HttpRequestException httpEx)
             {
                 Error = $"Error fetching data: {httpEx.Message}";
