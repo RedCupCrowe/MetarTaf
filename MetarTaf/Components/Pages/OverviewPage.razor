@@ -19,6 +19,7 @@
 <div>
     <input @bind="newIcao" placeholder="Enter ICAO code" />
     <button @onclick="AddAirport">Add Airport</button>
+    <button @onclick="ConfirmAllReports">Confirm all</button>
 </div>
 
 @foreach (var airportEntry in airports)
@@ -42,6 +43,7 @@
                 <h2>@airport.Icao</h2>
                 <button @onclick="() => RemoveAirport(airport.Icao)">Delete</button>
                 <button @onclick="() => NavigateToAirportPage(airport.Icao)">Airport page</button>
+                <button @onclick="() => ConfirmReports(airport)">Confirm</button>
                 <table class="table">
                     <thead>
                         <tr>
@@ -53,14 +55,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                        <tr class="@((airport.isNewTaf ? "new-report" : ""))">
                             <td rowspan="2">@airport.Icao</td>
                             <td>TAF: @tafTime.ToString("HH:mm") (@timeSinceLastTAF.ToString("hh\\:mm"))</td>
                             <td>(WIP)</td>
                             <td>TAF</td>
                             <td>@latestTaf.raw</td>
                         </tr>
-                        <tr>
+                        
+                        <tr class="@((airport.isNewMetar ? "new-report" : ""))">
                             <td>METAR: @metarTime.ToString("HH:mm") (@timeSinceLastMetar.ToString("hh\\:mm"))</td>
                             <td>(WIP)</td>
                             <td>METAR</td>
