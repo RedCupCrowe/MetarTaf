@@ -16,7 +16,7 @@
     <p>Current time: @currentTime.ToString("yyyy-MM-dd HH:mm:ss")</p>
 </div>
 
-<div>
+<div class="top-menu">
     <input @bind="newIcao" placeholder="Enter ICAO code" />
     <button @onclick="AddAirport">Add Airport</button>
     <button @onclick="ConfirmAllReports">Confirm all</button>
@@ -40,37 +40,34 @@
 
 
             <div>
-                <h2>@airport.Icao</h2>
-                <button @onclick="() => RemoveAirport(airport.Icao)">Delete</button>
-                <button @onclick="() => NavigateToAirportPage(airport.Icao)">Airport page</button>
-                <button @onclick="() => ConfirmReports(airport)">Confirm</button>
-                <table class="table">
+                
+                <table class="table-parent">
                     <thead>
                         <tr>
                             <th>Station</th>
-                            <th>Reports</th>
-                            <th>AMD/SPECi</th>
+                            <th>Report time</th>                            
                             <th>Report type</th>
                             <th>Raw report</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="@((airport.isNewTaf ? "new-report" : ""))">
-                            <td rowspan="2">@airport.Icao</td>
-                            <td>TAF: @tafTime.ToString("HH:mm") (@timeSinceLastTAF.ToString("hh\\:mm"))</td>
-                            <td>(WIP)</td>
-                            <td>TAF</td>
+                        <tr class="@((airport.isNewTaf ? "taf-new-report" : "taf-old-report"))">
+                            <td class="station-cell" rowspan="2">@airport.Icao</td>
+                            <td class="reports-time-cell">@tafTime.ToString("HH:mm") (@timeSinceLastTAF.ToString("hh\\:mm"))</td>
+                            <td class="report-type-cell">TAF</td>
                             <td>@latestTaf.raw</td>
                         </tr>
                         
-                        <tr class="@((airport.isNewMetar ? "new-report" : ""))">
-                            <td>METAR: @metarTime.ToString("HH:mm") (@timeSinceLastMetar.ToString("hh\\:mm"))</td>
-                            <td>(WIP)</td>
-                            <td>METAR</td>
+                        <tr class="@((airport.isNewMetar ? "metar-new-report" : "metar-old-report"))">
+                            <td class="reports-time-cell">@metarTime.ToString("HH:mm") (@timeSinceLastMetar.ToString("hh\\:mm"))</td>
+                            <td class="report-type-cell">METAR</td>
                             <td>@latestMetar.Raw</td>
                         </tr>
                     </tbody>
                 </table>
+                <button @onclick="() => RemoveAirport(airport.Icao)">Delete</button>
+                <button @onclick="() => NavigateToAirportPage(airport.Icao)">Airport page</button>
+                <button @onclick="() => ConfirmReports(airport)">Confirm</button>
             </div>
 
             
