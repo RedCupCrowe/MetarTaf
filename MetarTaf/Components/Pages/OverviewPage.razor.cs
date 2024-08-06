@@ -95,6 +95,24 @@ namespace MetarTaf.Components.Pages
             Navigation.NavigateTo($"/Airport/{icao}");
         }
 
+
+        public void ConfirmReports(Airport airport)
+        {
+            airport.MarkMetarAsOld();
+            airport.MarkTafAsOld();
+            StateHasChanged();
+        }
+
+        public void ConfirmAllReports()
+        {
+            foreach (var airport in airports.Values)
+            {
+                airport.MarkMetarAsOld();
+                airport.MarkTafAsOld();
+            }
+            StateHasChanged();
+        }
+
         public void Dispose()
         {
             timer?.Dispose();
@@ -103,5 +121,6 @@ namespace MetarTaf.Components.Pages
                 airport.Dispose();
             }
         }
+
     }
 }

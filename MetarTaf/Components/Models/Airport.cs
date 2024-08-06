@@ -18,6 +18,8 @@ namespace MetarTaf.Components.Models
         public DateTime? LastUpdated { get; private set; }
         public string? Error { get; private set; }
         public AirportInfo? Info { get; private set; }
+        public bool isNewMetar { get; set; }
+        public bool isNewTaf { get; set; }
 
         private Timer? timer;
         private readonly MetarService metarService;
@@ -26,6 +28,7 @@ namespace MetarTaf.Components.Models
         private readonly SynchronizationContext? syncContext;
         private readonly string metarStorageFilePath;
         private readonly string tafStorageFilePath;
+        
 
         // Delegate for notifying state changes
         public Action? OnStateChanged { get; set; }
@@ -57,6 +60,9 @@ namespace MetarTaf.Components.Models
 
             LoadMetars();
             LoadTafs();
+
+            isNewMetar = false;
+            isNewTaf = false;
         }
 
         private void EnsureDirectoryExists(string folderPath)
@@ -108,6 +114,7 @@ namespace MetarTaf.Components.Models
                     if (!Metars.ContainsKey(metarTime))
                     {
                         AddMetar(metarTime, metar);
+                        isNewMetar = true;
                     }
                 }
                 SaveMetars();
@@ -141,6 +148,7 @@ namespace MetarTaf.Components.Models
                     if (!Tafs.ContainsKey((DateTime)tafTime))
                     {
                         AddTaf((DateTime)tafTime, taf);
+                        isNewTaf = true;
                     }
                 }
                 SaveTafs();
@@ -302,6 +310,16 @@ namespace MetarTaf.Components.Models
                 Console.WriteLine($"Error loading TAFs: {ex.Message}");
                 Tafs = new Dictionary<DateTime, TAF>();
             }
+        }
+
+        public void MarkMetarAsOld()
+        {
+            isNewMetar = false;
+        }
+
+        public void MarkTafAsOld()
+        {
+            isNewTaf = false;
         }
 
         public void Dispose()
