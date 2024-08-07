@@ -85,7 +85,7 @@ namespace MetarTaf.Components.Models
             }
         }
 
-        public async Task InitializeAsync()
+        public async Task InitializeAsync() 
         {
             await FetchAirportInfoAsync();
             await FetchMetarAsync();
@@ -179,6 +179,7 @@ namespace MetarTaf.Components.Models
                 Info = await airportInfoService.GetAirportInfoAsync(Icao);
                 NotifyStateChanged();
             }
+
             catch (HttpRequestException httpEx)
             {
                 Error = $"Error fetching airport info: {httpEx.Message}";

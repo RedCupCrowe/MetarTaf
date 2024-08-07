@@ -20,6 +20,7 @@
     <input @bind="newIcao" placeholder="Enter ICAO code" />
     <button @onclick="AddAirport">Add Airport</button>
     <button @onclick="ConfirmAllReports">Confirm all</button>
+    <button @onclick="ClearAllAirports">Clear All Airports</button>
 </div>
 
 @foreach (var airportEntry in airports)

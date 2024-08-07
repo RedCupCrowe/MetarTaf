@@ -48,10 +48,31 @@ namespace MetarTaf.Components.Pages
             if (!string.IsNullOrEmpty(newIcao) && !airports.ContainsKey(newIcao))
             {
                 var airport = new Airport(newIcao, MetarService, tafService, AirportInfoService);
-                airports[newIcao] = airport;
-                await airport.InitializeAsync();
-                await SaveAirportsToLocalStorage();
-                StateHasChanged();
+
+                try
+                {
+                    await airport.InitializeAsync();
+
+                    // Check if the airport has valid data
+                    if (airport.Info != null && airport.Metars.Any() && airport.Tafs.Any())
+                    {
+                        airports[newIcao] = airport;
+                        await SaveAirportsToLocalStorage();
+                        StateHasChanged();
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Invalid airport data for ICAO: {newIcao}");
+                    }
+                }
+                catch (HttpRequestException httpEx)
+                {
+                    Console.WriteLine($"Error fetching data for ICAO {newIcao}: {httpEx.Message}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Unexpected error for ICAO {newIcao}: {ex.Message}");
+                }
             }
         }
 
@@ -64,6 +85,17 @@ namespace MetarTaf.Components.Pages
                 await SaveAirportsToLocalStorage();
                 StateHasChanged();
             }
+        }
+
+        private async Task ClearAllAirports()
+        {
+            foreach (var airport in airports.Values)
+            {
+                airport.Dispose();
+            }
+            airports.Clear(); // Clear the in-memory dictionary
+            await SaveAirportsToLocalStorage(); // Update the local storage
+            StateHasChanged(); // Notify the UI to re-render
         }
 
         private async Task SaveAirportsToLocalStorage()
@@ -95,7 +127,6 @@ namespace MetarTaf.Components.Pages
             Navigation.NavigateTo($"/Airport/{icao}");
         }
 
-
         public void ConfirmReports(Airport airport)
         {
             airport.MarkMetarAsOld();
@@ -121,6 +152,5 @@ namespace MetarTaf.Components.Pages
                 airport.Dispose();
             }
         }
-
     }
 }
