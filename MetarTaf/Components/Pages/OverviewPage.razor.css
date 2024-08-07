@@ -1,6 +1,7 @@
-﻿#header1 {
+﻿/* OverviewPage.razor.css */
+
+#header1 {
     text-align: center;
-    
 }
 
 .top-menu {
@@ -19,17 +20,52 @@
     text-align: center;
     vertical-align: middle;
     border-right: 1px solid #dddddd;
-    width: 5%;
+    width: 100px;
     font-weight: bold;
     font-size: 20px;
+    background-color: #007bff; /* Button background color */
+    color: white; /* Button text color */
+    padding: 10px 20px; /* Button padding */
+    cursor: pointer; /* Pointer cursor on hover */
+    
+    transition-duration: 0.4s; /* Smooth transition */
+    border: solid black 1px; 
 }
+
+    .station-cell:hover {
+        background-color: #0056b3; /* Darker background on hover */
+    }
+
+.actions-cell {
+    text-align: left;
+    vertical-align: middle;
+    width: 35px;
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin: 5px;
+}
+
+    .icon-button img {
+        width: 20px;
+        height: 20px;
+    }
 
 .taf-new-report {
     background-color: red;
+    border-top: 1px solid black;
+    border-bottom: 1px solid #dddddd;
+    color: white;
 }
 
 .metar-new-report {
     background-color: red;
+    border-bottom: 1px solid black;
+    color: white;
 }
 
 .metar-old-report {
@@ -50,4 +86,3 @@
     width: 75px;
     border-right: 1px solid #dddddd;
 }
-
