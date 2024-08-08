@@ -28,6 +28,7 @@ namespace MetarTaf.Components.Models
         private readonly SynchronizationContext? syncContext;
         private readonly string metarStorageFilePath;
         private readonly string tafStorageFilePath;
+        private int referenceCount;
         
 
         // Delegate for notifying state changes
@@ -134,6 +135,7 @@ namespace MetarTaf.Components.Models
                 NotifyStateChanged();
             }
         }
+
 
         public async Task FetchTafAsync()
         {
@@ -322,6 +324,24 @@ namespace MetarTaf.Components.Models
         public void MarkTafAsOld()
         {
             isNewTaf = false;
+        }
+
+
+        public void IncrementReferenceCount()
+        {
+            referenceCount++;
+        }
+
+        // Method to decrement reference count
+        public void DecrementReferenceCount()
+        {
+            referenceCount--;
+        }
+
+        // Method to check if the airport is still in use
+        public bool IsInUse()
+        {
+            return referenceCount > 0;
         }
 
         public void Dispose()
