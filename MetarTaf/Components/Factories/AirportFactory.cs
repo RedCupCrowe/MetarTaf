@@ -6,18 +6,21 @@ namespace MetarTaf.Components.Factories
 {
     public class AirportFactory
     {
-        private static readonly Dictionary<string, Airport> airports = new Dictionary<string, Airport>();
-        [Inject] private static MetarService metarService { get; set; }
-        [Inject] private static TAFService tafService { get; set; }
-        [Inject] private static AirportInfoService airportInfoService { get; set; }
+        private readonly MetarService metarService;
+        private readonly TAFService tafService;
+        private readonly AirportInfoService airportInfoService;
 
+        private readonly Dictionary<string, Airport> airports = new Dictionary<string, Airport>();
+        private readonly object lockObject = new object();
 
-      
-        // Lock object for thread safety
-        private static readonly object lockObject = new object();
+        public AirportFactory(MetarService metarService, TAFService tafService, AirportInfoService airportInfoService)
+        {
+            this.metarService = metarService;
+            this.tafService = tafService;
+            this.airportInfoService = airportInfoService;
+        }
 
-        // Method to get or create an Airport instance
-        public static Airport GetAirport(string icao)
+        public Airport GetAirport(string icao)
         {
             lock (lockObject)
             {
@@ -32,12 +35,13 @@ namespace MetarTaf.Components.Factories
                     airports[icao].IncrementReferenceCount();
                 }
 
+                Console.WriteLine("Factory stored airports: " + airports.Keys.ToString());
+
                 return airports[icao];
             }
         }
 
-
-        public static void ReleaseAirport(string icao)
+        public void ReleaseAirport(string icao)
         {
             lock (lockObject)
             {
@@ -47,13 +51,13 @@ namespace MetarTaf.Components.Factories
 
                     if (!airports[icao].IsInUse())
                     {
-                        // Optionally, you can call Dispose or clean up resources here
                         airports[icao].Dispose();
                         airports.Remove(icao);
                     }
                 }
+
+                Console.WriteLine("Factory stored airports: " + airports.Keys.ToString());
             }
         }
-
     }
 }

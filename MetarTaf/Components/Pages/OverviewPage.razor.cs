@@ -17,7 +17,7 @@ namespace MetarTaf.Components.Pages
         private bool isInitialized = false;
 
         [Inject] private IJSRuntime JSRuntime { get; set; }
-
+        [Inject] private AirportFactory AirportFactory { get; set; }
         private const string AirportsStorageKey = "airports";
 
         protected override void OnInitialized()
@@ -77,6 +77,7 @@ namespace MetarTaf.Components.Pages
 
         private async Task RemoveAirport(string icao)
         {
+            airports.RemoveAll(a => a.Icao == icao);
             AirportFactory.ReleaseAirport(icao);
         }
 
@@ -84,6 +85,7 @@ namespace MetarTaf.Components.Pages
         {
             foreach (var airport in airports)
             {
+               
                 AirportFactory.ReleaseAirport(airport.Icao);
             }
 
