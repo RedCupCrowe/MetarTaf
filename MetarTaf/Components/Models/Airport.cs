@@ -28,6 +28,7 @@ namespace MetarTaf.Components.Models
         private readonly SynchronizationContext? syncContext;
         private readonly string metarStorageFilePath;
         private readonly string tafStorageFilePath;
+        private int referenceCount;
         
 
         // Delegate for notifying state changes
@@ -105,6 +106,17 @@ namespace MetarTaf.Components.Models
             try
             {
                 Console.WriteLine("FetchMetarAsync invoked");
+
+                if (metarService == null)
+                {
+                    throw new InvalidOperationException("metarService is not initialized.");
+                }
+
+                if (string.IsNullOrEmpty(Icao))
+                {
+                    throw new InvalidOperationException("Icao is not set.");
+                }
+
                 var metar = await metarService.GetMetarAsync(Icao);
                 LastUpdated = DateTime.UtcNow;
 
@@ -120,7 +132,6 @@ namespace MetarTaf.Components.Models
                 SaveMetars();
                 NotifyStateChanged();
             }
-
             catch (HttpRequestException httpEx)
             {
                 Error = $"Error fetching data: {httpEx.Message}";
@@ -135,11 +146,22 @@ namespace MetarTaf.Components.Models
             }
         }
 
+
+
         public async Task FetchTafAsync()
         {
             try
             {
                 Console.WriteLine("FetchTafAsync invoked");
+                if (tafService == null)
+                {
+                    throw new InvalidOperationException("tafService is not initialized.");
+                }
+                if (string.IsNullOrEmpty(Icao))
+                {
+                    throw new ArgumentException("Icao cannot be null or empty");
+                }
+
                 TAF taf = await tafService.GetTAFAsync(Icao);
                 LastUpdated = DateTime.UtcNow;
 
@@ -171,15 +193,27 @@ namespace MetarTaf.Components.Models
 
 
 
+
+
         public async Task FetchAirportInfoAsync()
         {
             try
             {
                 Console.WriteLine("FetchAirportInfoAsync invoked");
+
+                if (airportInfoService == null)
+                {
+                    throw new InvalidOperationException("airportInfoService is not initialized.");
+                }
+
+                if (string.IsNullOrEmpty(Icao))
+                {
+                    throw new InvalidOperationException("Icao is not set.");
+                }
+
                 Info = await airportInfoService.GetAirportInfoAsync(Icao);
                 NotifyStateChanged();
             }
-
             catch (HttpRequestException httpEx)
             {
                 Error = $"Error fetching airport info: {httpEx.Message}";
@@ -193,6 +227,7 @@ namespace MetarTaf.Components.Models
                 NotifyStateChanged();
             }
         }
+
 
         private void NotifyStateChanged()
         {
@@ -322,6 +357,24 @@ namespace MetarTaf.Components.Models
         public void MarkTafAsOld()
         {
             isNewTaf = false;
+        }
+
+
+        public void IncrementReferenceCount()
+        {
+            referenceCount++;
+        }
+
+        // Method to decrement reference count
+        public void DecrementReferenceCount()
+        {
+            referenceCount--;
+        }
+
+        // Method to check if the airport is still in use
+        public bool IsInUse()
+        {
+            return referenceCount > 0;
         }
 
         public void Dispose()

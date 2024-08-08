@@ -1,7 +1,9 @@
+using MetarTaf.Components.Factories;
 using MetarTaf.Components.Models;
 using MetarTaf.Components.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Collections;
 using System.Text.Json;
 
 namespace MetarTaf.Components.Pages
@@ -11,14 +13,11 @@ namespace MetarTaf.Components.Pages
         private DateTime currentTime;
         private Timer? timer;
         private string newIcao = string.Empty;
-        private Dictionary<string, Airport> airports = new();
+        private List<Airport> airports = new List<Airport>();
         private bool isInitialized = false;
 
-        [Inject] private MetarService MetarService { get; set; }
-        [Inject] private TAFService tafService { get; set; }
-        [Inject] private AirportInfoService AirportInfoService { get; set; }
         [Inject] private IJSRuntime JSRuntime { get; set; }
-
+        [Inject] private AirportFactory AirportFactory { get; set; }
         private const string AirportsStorageKey = "airports";
 
         protected override void OnInitialized()
@@ -45,9 +44,9 @@ namespace MetarTaf.Components.Pages
 
         private async Task AddAirport()
         {
-            if (!string.IsNullOrEmpty(newIcao) && !airports.ContainsKey(newIcao))
+            if (!string.IsNullOrEmpty(newIcao))
             {
-                var airport = new Airport(newIcao, MetarService, tafService, AirportInfoService);
+                var airport = AirportFactory.GetAirport(newIcao);
 
                 try
                 {
@@ -56,7 +55,7 @@ namespace MetarTaf.Components.Pages
                     // Check if the airport has valid data
                     if (airport.Info != null && airport.Metars.Any() && airport.Tafs.Any())
                     {
-                        airports[newIcao] = airport;
+                        airports.Add(airport);
                         await SaveAirportsToLocalStorage();
                         StateHasChanged();
                     }
@@ -78,21 +77,18 @@ namespace MetarTaf.Components.Pages
 
         private async Task RemoveAirport(string icao)
         {
-            if (airports.ContainsKey(icao))
-            {
-                airports[icao].Dispose();
-                airports.Remove(icao);
-                await SaveAirportsToLocalStorage();
-                StateHasChanged();
-            }
+            airports.RemoveAll(a => a.Icao == icao);
+            AirportFactory.ReleaseAirport(icao);
         }
 
         private async Task ClearAllAirports()
         {
-            foreach (var airport in airports.Values)
+            foreach (var airport in airports)
             {
-                airport.Dispose();
+               
+                AirportFactory.ReleaseAirport(airport.Icao);
             }
+
             airports.Clear(); // Clear the in-memory dictionary
             await SaveAirportsToLocalStorage(); // Update the local storage
             StateHasChanged(); // Notify the UI to re-render
@@ -100,7 +96,13 @@ namespace MetarTaf.Components.Pages
 
         private async Task SaveAirportsToLocalStorage()
         {
-            var icaoList = airports.Keys.ToList();
+            List<string> icaoList = new List<string>();
+
+            foreach (Airport airport in airports)
+            {
+                icaoList.Add(airport.Icao);
+            }
+
             await JSRuntime.InvokeVoidAsync("localStorage.setItem", AirportsStorageKey, JsonSerializer.Serialize(icaoList));
         }
 
@@ -114,8 +116,8 @@ namespace MetarTaf.Components.Pages
                 {
                     foreach (var icao in icaoList)
                     {
-                        var airport = new Airport(icao, MetarService, tafService, AirportInfoService);
-                        airports[icao] = airport;
+                        var airport = AirportFactory.GetAirport(icao);
+                        airports.Add(airport);
                         await airport.InitializeAsync();
                     }
                 }
@@ -136,7 +138,7 @@ namespace MetarTaf.Components.Pages
 
         public void ConfirmAllReports()
         {
-            foreach (var airport in airports.Values)
+            foreach (var airport in airports)
             {
                 airport.MarkMetarAsOld();
                 airport.MarkTafAsOld();
@@ -147,9 +149,9 @@ namespace MetarTaf.Components.Pages
         public void Dispose()
         {
             timer?.Dispose();
-            foreach (var airport in airports.Values)
+            foreach (var airport in airports)
             {
-                airport.Dispose();
+                AirportFactory.ReleaseAirport(airport.Icao);
             }
         }
     }

@@ -1,4 +1,5 @@
 using MetarTaf.Components;
+using MetarTaf.Components.Factories;
 using MetarTaf.Components.Services;
 
 
@@ -11,7 +12,8 @@ builder.Services.AddRazorComponents()
     .Services
     .AddSingleton(new MetarService(new HttpClient(), apiKey))
     .AddSingleton(new TAFService(new HttpClient(), apiKey))
-    .AddSingleton(new AirportInfoService(new HttpClient(), apiKey));
+    .AddSingleton(new AirportInfoService(new HttpClient(), apiKey))
+    .AddSingleton<AirportFactory>(); ;
 
 var app = builder.Build();
 

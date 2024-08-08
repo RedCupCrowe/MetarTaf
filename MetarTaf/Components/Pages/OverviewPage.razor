@@ -23,9 +23,9 @@
     <button @onclick="ClearAllAirports">Clear All Airports</button>
 </div>
 
-@foreach (var airportEntry in airports)
+@foreach (var airport in airports)
 {
-    var airport = airportEntry.Value;
+    
     var latestMetar = airport.Metars.OrderByDescending(m => m.Key).FirstOrDefault().Value;
     var latestTaf = airport.Tafs.OrderByDescending(t => t.Key).FirstOrDefault().Value;
 
