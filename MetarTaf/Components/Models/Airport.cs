@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MetarTaf.Components.Services;
 using MetarTaf.Components.Models;
+using MetarTaf.Components.Factories;
 
 namespace MetarTaf.Components.Models
 {
@@ -218,6 +219,7 @@ namespace MetarTaf.Components.Models
             {
                 Error = $"Error fetching airport info: {httpEx.Message}";
                 Console.WriteLine(Error);
+               
                 NotifyStateChanged();
             }
             catch (Exception ex)

@@ -46,10 +46,10 @@ namespace MetarTaf.Components.Pages
         {
             if (!string.IsNullOrEmpty(newIcao))
             {
-                var airport = AirportFactory.GetAirport(newIcao);
-
                 try
                 {
+                    var airport = AirportFactory.GetAirport(newIcao);
+
                     await airport.InitializeAsync();
 
                     // Check if the airport has valid data
