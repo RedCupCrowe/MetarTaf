@@ -1,7 +1,6 @@
 using MetarTaf.Components;
-using MetarTaf.Components.Factories;
 using MetarTaf.Components.Services;
-
+using MetarTaf.Components.Factories;
 
 var builder = WebApplication.CreateBuilder(args);
 string apiKey = "pp7LF-kDXnpRRq6vGPtDO7Dij_7fAJuN3w9HpQtInYA";
@@ -10,23 +9,27 @@ string apiKey = "pp7LF-kDXnpRRq6vGPtDO7Dij_7fAJuN3w9HpQtInYA";
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .Services
-    .AddSingleton(new MetarService(new HttpClient(), apiKey))
-    .AddSingleton(new TAFService(new HttpClient(), apiKey))
-    .AddSingleton(new AirportInfoService(new HttpClient(), apiKey))
-    .AddSingleton<AirportFactory>(); ;
+    .AddSingleton(new HttpClient())
+    .AddSingleton(sp => new MetarService(sp.GetRequiredService<HttpClient>(), apiKey))
+    .AddSingleton(sp => new TAFService(sp.GetRequiredService<HttpClient>(), apiKey))
+    .AddSingleton(sp => new AirportInfoService(sp.GetRequiredService<HttpClient>(), apiKey));
 
 var app = builder.Build();
+
+// Initialize AirportFactory with the required services
+var metarService = app.Services.GetRequiredService<MetarService>();
+var tafService = app.Services.GetRequiredService<TAFService>();
+var airportInfoService = app.Services.GetRequiredService<AirportInfoService>();
+AirportFactory.Initialize(metarService, tafService, airportInfoService);
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
 app.UseAntiforgery();
 

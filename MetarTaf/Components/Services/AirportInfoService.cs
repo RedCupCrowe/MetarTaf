@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using MetarTaf.Components.Factories;
 using MetarTaf.Components.Models;
 
 namespace MetarTaf.Components.Services
@@ -21,7 +22,6 @@ namespace MetarTaf.Components.Services
         {
             var response = await httpClient.GetAsync($"station/{ident}?format=json");
             response.EnsureSuccessStatusCode();
-
             var responseData = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<AirportInfo>(responseData);
         }

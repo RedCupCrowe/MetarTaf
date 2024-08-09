@@ -1,4 +1,5 @@
-﻿using MetarTaf.Components.Models;
+﻿using MetarTaf.Components.Factories;
+using MetarTaf.Components.Models;
 using System.Text.Json;
 
 namespace MetarTaf.Components.Services
@@ -35,6 +36,7 @@ namespace MetarTaf.Components.Services
             catch (JsonException ex)
             {
                 Console.WriteLine($"Error deserializing JSON: {ex.Message}");
+                AirportFactory.ReleaseAirport(icao);
                 return null;
             }
         }

@@ -17,7 +17,7 @@ namespace MetarTaf.Components.Pages
         private bool isInitialized = false;
 
         [Inject] private IJSRuntime JSRuntime { get; set; }
-        [Inject] private AirportFactory AirportFactory { get; set; }
+        
         private const string AirportsStorageKey = "airports";
 
         protected override void OnInitialized()
