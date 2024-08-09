@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
@@ -29,8 +30,8 @@ namespace MetarTaf.Components.Models
         private readonly SynchronizationContext? syncContext;
         private readonly string metarStorageFilePath;
         private readonly string tafStorageFilePath;
+        private readonly string infoStorageFilePath;
         private int referenceCount;
-        
 
         // Delegate for notifying state changes
         public Action? OnStateChanged { get; set; }
@@ -50,15 +51,19 @@ namespace MetarTaf.Components.Models
             var resourcesFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources");
             var metarsFolder = Path.Combine(resourcesFolder, "Metars");
             var tafsFolder = Path.Combine(resourcesFolder, "Tafs");
+            var infoFolder = Path.Combine(resourcesFolder, "Info");
 
             EnsureDirectoryExists(metarsFolder);
             EnsureDirectoryExists(tafsFolder);
+            EnsureDirectoryExists(infoFolder);
 
             metarStorageFilePath = Path.Combine(metarsFolder, $"{icao}_metars.json");
             tafStorageFilePath = Path.Combine(tafsFolder, $"{icao}_tafs.json");
+            infoStorageFilePath = Path.Combine(infoFolder, $"{icao}_info.json");
 
             Console.WriteLine($"METAR storage file path: {metarStorageFilePath}");
             Console.WriteLine($"TAF storage file path: {tafStorageFilePath}");
+            Console.WriteLine($"Info storage file path: {infoStorageFilePath}");
 
             LoadMetars();
             LoadTafs();
@@ -87,7 +92,7 @@ namespace MetarTaf.Components.Models
             }
         }
 
-        public async Task InitializeAsync() 
+        public async Task InitializeAsync()
         {
             await FetchAirportInfoAsync();
             await FetchMetarAsync();
@@ -147,8 +152,6 @@ namespace MetarTaf.Components.Models
             }
         }
 
-
-
         public async Task FetchTafAsync()
         {
             try
@@ -192,10 +195,6 @@ namespace MetarTaf.Components.Models
             }
         }
 
-
-
-
-
         public async Task FetchAirportInfoAsync()
         {
             try
@@ -212,14 +211,30 @@ namespace MetarTaf.Components.Models
                     throw new InvalidOperationException("Icao is not set.");
                 }
 
+                // Check if the info file exists and is not older than one month
+                if (File.Exists(infoStorageFilePath))
+                {
+                    var fileInfo = new FileInfo(infoStorageFilePath);
+                    if (fileInfo.LastWriteTime > DateTime.Now.AddMonths(-1))
+                    {
+                        Info = await LoadAirportInfoAsync();
+                        if (Info != null)
+                        {
+                            NotifyStateChanged();
+                            return;
+                        }
+                    }
+                }
+
+                // Fetch from API if not found or outdated
                 Info = await airportInfoService.GetAirportInfoAsync(Icao);
+                await SaveAirportInfoAsync();
                 NotifyStateChanged();
             }
             catch (HttpRequestException httpEx)
             {
                 Error = $"Error fetching airport info: {httpEx.Message}";
                 Console.WriteLine(Error);
-               
                 NotifyStateChanged();
             }
             catch (Exception ex)
@@ -229,7 +244,6 @@ namespace MetarTaf.Components.Models
                 NotifyStateChanged();
             }
         }
-
 
         private void NotifyStateChanged()
         {
@@ -351,6 +365,23 @@ namespace MetarTaf.Components.Models
             }
         }
 
+        private async Task SaveAirportInfoAsync()
+        {
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            var json = JsonSerializer.Serialize(Info, options);
+            await File.WriteAllTextAsync(infoStorageFilePath, json);
+        }
+
+        private async Task<AirportInfo?> LoadAirportInfoAsync()
+        {
+            if (File.Exists(infoStorageFilePath))
+            {
+                var json = await File.ReadAllTextAsync(infoStorageFilePath);
+                return JsonSerializer.Deserialize<AirportInfo>(json);
+            }
+            return null;
+        }
+
         public void MarkMetarAsOld()
         {
             isNewMetar = false;
@@ -360,7 +391,6 @@ namespace MetarTaf.Components.Models
         {
             isNewTaf = false;
         }
-
 
         public void IncrementReferenceCount()
         {
