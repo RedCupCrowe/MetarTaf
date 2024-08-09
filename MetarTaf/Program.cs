@@ -3,16 +3,15 @@ using MetarTaf.Components.Services;
 using MetarTaf.Components.Factories;
 
 var builder = WebApplication.CreateBuilder(args);
-string apiKey = "pp7LF-kDXnpRRq6vGPtDO7Dij_7fAJuN3w9HpQtInYA";
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .Services
     .AddSingleton(new HttpClient())
-    .AddSingleton(sp => new MetarService(sp.GetRequiredService<HttpClient>(), apiKey))
-    .AddSingleton(sp => new TAFService(sp.GetRequiredService<HttpClient>(), apiKey))
-    .AddSingleton(sp => new AirportInfoService(sp.GetRequiredService<HttpClient>(), apiKey));
+    .AddSingleton(sp => new MetarService(sp.GetRequiredService<HttpClient>(), GetApiKey(builder.Configuration)))
+    .AddSingleton(sp => new TAFService(sp.GetRequiredService<HttpClient>(), GetApiKey(builder.Configuration)))
+    .AddSingleton(sp => new AirportInfoService(sp.GetRequiredService<HttpClient>(), GetApiKey(builder.Configuration)));
 
 var app = builder.Build();
 
@@ -37,3 +36,22 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
 app.Run();
+
+static string GetApiKey(IConfiguration configuration)
+{
+    // Try to get the API key from environment variables first
+    var apiKey = Environment.GetEnvironmentVariable("API_KEY");
+
+    // If not found, fall back to the configuration file
+    if (string.IsNullOrEmpty(apiKey))
+    {
+        apiKey = configuration["ApiSettings:ApiKey"];
+    }
+
+    if (string.IsNullOrEmpty(apiKey))
+    {
+        throw new InvalidOperationException("API key is not set.");
+    }
+
+    return apiKey;
+}
