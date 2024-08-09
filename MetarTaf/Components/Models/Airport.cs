@@ -309,17 +309,32 @@ namespace MetarTaf.Components.Models
 
                     if (loadedMetars.Any())
                     {
-                        var lastMetarTime = loadedMetars.Keys.Max();
-                        if (DateTime.UtcNow - lastMetarTime > TimeSpan.FromHours(12))
+                        var now = DateTime.UtcNow;
+                        var twelveHoursAgo = now - TimeSpan.FromHours(12);
+
+                        // Remove METARs older than 12 hours
+                        var recentMetars = loadedMetars.Where(kvp => kvp.Key >= twelveHoursAgo).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+                        if (recentMetars.Any())
                         {
-                            Console.WriteLine("Last metar is older than 12 hours. Clearing metars.");
-                            Metars.Clear();
-                            File.Delete(metarStorageFilePath);
+                            var lastMetarTime = recentMetars.Keys.Max();
+                            if (now - lastMetarTime > TimeSpan.FromHours(12))
+                            {
+                                Console.WriteLine("Last metar is older than 12 hours. Clearing metars.");
+                                Metars.Clear();
+                                File.Delete(metarStorageFilePath);
+                            }
+                            else
+                            {
+                                Metars = recentMetars;
+                                Console.WriteLine("Metars loaded successfully.");
+                            }
                         }
                         else
                         {
-                            Metars = loadedMetars;
-                            Console.WriteLine("Metars loaded successfully.");
+                            Console.WriteLine("All metars are older than 12 hours. Clearing metars.");
+                            Metars.Clear();
+                            File.Delete(metarStorageFilePath);
                         }
                     }
                 }
@@ -343,17 +358,32 @@ namespace MetarTaf.Components.Models
 
                     if (loadedTafs.Any())
                     {
-                        var lastTafTime = loadedTafs.Keys.Max();
-                        if (DateTime.UtcNow - lastTafTime > TimeSpan.FromHours(12))
+                        var now = DateTime.UtcNow;
+                        var twelveHoursAgo = now - TimeSpan.FromHours(12);
+
+                        // Remove TAFs older than 12 hours
+                        var recentTafs = loadedTafs.Where(kvp => kvp.Key >= twelveHoursAgo).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+                        if (recentTafs.Any())
                         {
-                            Console.WriteLine("Last TAF is older than 12 hours. Clearing TAFs.");
-                            Tafs.Clear();
-                            File.Delete(tafStorageFilePath);
+                            var lastTafTime = recentTafs.Keys.Max();
+                            if (now - lastTafTime > TimeSpan.FromHours(12))
+                            {
+                                Console.WriteLine("Last TAF is older than 12 hours. Clearing TAFs.");
+                                Tafs.Clear();
+                                File.Delete(tafStorageFilePath);
+                            }
+                            else
+                            {
+                                Tafs = recentTafs;
+                                Console.WriteLine("TAFs loaded successfully.");
+                            }
                         }
                         else
                         {
-                            Tafs = loadedTafs;
-                            Console.WriteLine("TAFs loaded successfully.");
+                            Console.WriteLine("All TAFs are older than 12 hours. Clearing TAFs.");
+                            Tafs.Clear();
+                            File.Delete(tafStorageFilePath);
                         }
                     }
                 }
@@ -364,6 +394,7 @@ namespace MetarTaf.Components.Models
                 Tafs = new Dictionary<DateTime, TAF>();
             }
         }
+
 
         private async Task SaveAirportInfoAsync()
         {
