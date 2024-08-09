@@ -12,13 +12,14 @@ namespace MetarTaf.Components.Pages
     {
         private DateTime currentTime;
         private Timer? timer;
-        private string newIcao = string.Empty;
         private List<Airport> airports = new List<Airport>();
         private bool isInitialized = false;
 
         [Inject] private IJSRuntime JSRuntime { get; set; }
-        
+
+
         private const string AirportsStorageKey = "airports";
+        private NewAirportModel newAirportModel = new NewAirportModel();
 
         protected override void OnInitialized()
         {
@@ -44,11 +45,11 @@ namespace MetarTaf.Components.Pages
 
         private async Task AddAirport()
         {
-            if (!string.IsNullOrEmpty(newIcao))
+            if (!string.IsNullOrEmpty(newAirportModel.Icao))
             {
                 try
                 {
-                    var airport = AirportFactory.GetAirport(newIcao);
+                    var airport = AirportFactory.GetAirport(newAirportModel.Icao);
 
                     await airport.InitializeAsync();
 
@@ -57,20 +58,21 @@ namespace MetarTaf.Components.Pages
                     {
                         airports.Add(airport);
                         await SaveAirportsToLocalStorage();
+                        newAirportModel.Icao = string.Empty;
                         StateHasChanged();
                     }
                     else
                     {
-                        Console.WriteLine($"Invalid airport data for ICAO: {newIcao}");
+                        Console.WriteLine($"Invalid airport data for ICAO: {newAirportModel.Icao}");
                     }
                 }
                 catch (HttpRequestException httpEx)
                 {
-                    Console.WriteLine($"Error fetching data for ICAO {newIcao}: {httpEx.Message}");
+                    Console.WriteLine($"Error fetching data for ICAO {newAirportModel.Icao}: {httpEx.Message}");
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Unexpected error for ICAO {newIcao}: {ex.Message}");
+                    Console.WriteLine($"Unexpected error for ICAO {newAirportModel.Icao}: {ex.Message}");
                 }
             }
         }
@@ -79,13 +81,14 @@ namespace MetarTaf.Components.Pages
         {
             airports.RemoveAll(a => a.Icao == icao);
             AirportFactory.ReleaseAirport(icao);
+            await SaveAirportsToLocalStorage();
+            StateHasChanged();
         }
 
         private async Task ClearAllAirports()
         {
             foreach (var airport in airports)
             {
-               
                 AirportFactory.ReleaseAirport(airport.Icao);
             }
 
@@ -127,6 +130,11 @@ namespace MetarTaf.Components.Pages
         private void NavigateToAirportPage(string icao)
         {
             Navigation.NavigateTo($"/Airport/{icao}");
+        }
+
+        private class NewAirportModel
+        {
+            public string Icao { get; set; } = string.Empty;
         }
 
         public void ConfirmReports(Airport airport)
