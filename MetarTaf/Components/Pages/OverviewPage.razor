@@ -18,7 +18,7 @@
 
 <div class="top-menu">
     <EditForm Model="newAirportModel" OnValidSubmit="AddAirport">
-        <InputText @bind-Value="newAirportModel.Icao" placeholder="Enter ICAO code" @oninput="@(e => newAirportModel.Icao = e.Value.ToString().ToUpper())" />
+        <InputText @bind-Value="newAirportModel.Icao" placeholder="Enter ICAO code" @oninput="@(e => newAirportModel.Icao = e.Value?.ToString()?.ToUpper() ?? string.Empty)" />
         <button type="submit">Add Airport</button>
     </EditForm>
     <button @onclick="ConfirmAllReports">Confirm all</button>
@@ -30,53 +30,77 @@
     var latestMetar = airport.Metars.OrderByDescending(m => m.Key).FirstOrDefault().Value;
     var latestTaf = airport.Tafs.OrderByDescending(t => t.Key).FirstOrDefault().Value;
 
-    if (latestMetar != null)
-    {
-        var metarTime = latestMetar.Time?.Dt ?? DateTime.MinValue;
-        var timeSinceLastMetar = currentTime - metarTime;
+    var metarTime = latestMetar?.Time?.Dt ?? DateTime.MinValue;
+    var timeSinceLastMetar = currentTime - metarTime;
+    var tafTime = latestTaf?.time?.dt ?? DateTime.MinValue;
+    var timeSinceLastTAF = currentTime - tafTime;
 
-        if (latestTaf != null)
-        {
-            var tafTime = latestTaf.time?.dt ?? DateTime.MinValue;
-            var timeSinceLastTAF = currentTime - tafTime;
+    <div>
+        <table class="table-parent">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Station</th>
+                    <th>Report time</th>
+                    <th>Report type</th>
+                    <th>Raw report</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="actions-cell" rowspan="2">
+                        <button @onclick="() => ConfirmReports(airport)">
+                            ✔️
+                        </button>
+                        <button @onclick="() => RemoveAirport(airport.Icao)">
+                            ❌
+                        </button>
+                    </td>
+                    <td class="station-cell" rowspan="2" @onclick="() => NavigateToAirportPage(airport.Icao)">
+                        @airport.Icao
+                    </td>
 
-            <div>
-                <table class="table-parent">
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th>Station</th>
-                            <th>Report time</th>
-                            <th>Report type</th>
-                            <th>Raw report</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="actions-cell" rowspan="2">
-                                <button @onclick="() => ConfirmReports(airport)">
-                                    ✔️
-                                </button>
-                                <button @onclick="() => RemoveAirport(airport.Icao)">
-                                    ❌
-                                </button>
-                            </td>
-                            <td class="station-cell" rowspan="2" @onclick="() => NavigateToAirportPage(airport.Icao)">
-                                @airport.Icao
-                            </td>
-                            <td class="reports-time-cell @((airport.isNewTaf ? "taf-new-report" : "taf-old-report"))">@tafTime.ToString("HH:mm") (@timeSinceLastTAF.ToString("hh\\:mm"))</td>
-                            <td class="report-type-cell @((airport.isNewTaf ? "taf-new-report" : "taf-old-report"))">TAF</td>
-                            <td class="@((airport.isNewTaf ? "taf-new-report" : "taf-old-report"))">@latestTaf.raw</td>
-                        </tr>
+                    @if (latestTaf != null)
+                    {
+                        <td class="reports-time-cell @((airport.isNewTaf ? "taf-new-report" : "taf-old-report"))">
+                            @tafTime.ToString("HH:mm") (@timeSinceLastTAF.ToString(@"hh\:mm"))
+                        </td>
+                        <td class="report-type-cell @((airport.isNewTaf ? "taf-new-report" : "taf-old-report"))">
+                            TAF
+                        </td>
+                        <td class="@((airport.isNewTaf ? "taf-new-report" : "taf-old-report"))">
+                            @latestTaf.raw
+                        </td>
+                    }
+                    else
+                    {
+                        <td class="reports-time-cell">Loading...</td>
+                        <td class="report-type-cell">TAF</td>
+                        <td class="taf-old-report">Loading...</td>
+                    }
+                </tr>
 
-                        <tr>
-                            <td class="reports-time-cell @((airport.isNewMetar ? "metar-new-report" : "metar-old-report"))">@metarTime.ToString("HH:mm") (@timeSinceLastMetar.ToString("hh\\:mm"))</td>
-                            <td class="report-type-cell @((airport.isNewMetar ? "metar-new-report" : "metar-old-report"))">METAR</td>
-                            <td class="@((airport.isNewMetar ? "metar-new-report" : "metar-old-report"))">@latestMetar.Raw</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        }
-    }
+                <tr>
+                    @if (latestMetar != null)
+                    {
+                        <td class="reports-time-cell @((airport.isNewMetar ? "metar-new-report" : "metar-old-report"))">
+                            @metarTime.ToString("HH:mm") (@timeSinceLastMetar.ToString(@"hh\:mm"))
+                        </td>
+                        <td class="report-type-cell @((airport.isNewMetar ? "metar-new-report" : "metar-old-report"))">
+                            METAR
+                        </td>
+                        <td class="@((airport.isNewMetar ? "metar-new-report" : "metar-old-report"))">
+                            @latestMetar.Raw
+                        </td>
+                    }
+                    else
+                    {
+                        <td class="reports-time-cell">Loading...</td>
+                        <td class="report-type-cell">METAR</td>
+                        <td class="metar-old-report">Loading...</td>
+                    }
+                </tr>
+            </tbody>
+        </table>
+    </div>
 }

@@ -47,16 +47,30 @@ namespace MetarTaf.Components.Pages
         {
             if (!string.IsNullOrEmpty(newAirportModel.Icao))
             {
+                var placeholderAirport = new Airport(
+                    newAirportModel.Icao,
+                    null, // Provide the required MetarService instance
+                    null,   // Provide the required TAFService instance
+                    null// Provide the required AirportInfoService instance
+                );
+
+                airports.Add(placeholderAirport);
+                StateHasChanged();
+
                 try
                 {
                     var airport = AirportFactory.GetAirport(newAirportModel.Icao);
-
                     await airport.InitializeAsync();
 
                     // Check if the airport has valid data
                     if (airport.Info != null && airport.Metars.Any() && airport.Tafs.Any())
                     {
-                        airports.Add(airport);
+                        // Replace the placeholder with the actual airport data
+                        var index = airports.IndexOf(placeholderAirport);
+                        if (index != -1)
+                        {
+                            airports[index] = airport;
+                        }
                         await SaveAirportsToLocalStorage();
                         newAirportModel.Icao = string.Empty;
                         StateHasChanged();
@@ -64,15 +78,21 @@ namespace MetarTaf.Components.Pages
                     else
                     {
                         Console.WriteLine($"Invalid airport data for ICAO: {newAirportModel.Icao}");
+                        airports.Remove(placeholderAirport);
+                        StateHasChanged();
                     }
                 }
                 catch (HttpRequestException httpEx)
                 {
                     Console.WriteLine($"Error fetching data for ICAO {newAirportModel.Icao}: {httpEx.Message}");
+                    airports.Remove(placeholderAirport);
+                    StateHasChanged();
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Unexpected error for ICAO {newAirportModel.Icao}: {ex.Message}");
+                    airports.Remove(placeholderAirport);
+                    StateHasChanged();
                 }
             }
         }
