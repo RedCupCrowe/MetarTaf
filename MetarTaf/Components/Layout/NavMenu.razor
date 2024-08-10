@@ -1,30 +1,25 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">MetarTaf</a>
+﻿<nav class="navbar navbar-expand-lg custom-navbar w-100">
+    <a class="navbar-brand" href="">MetarTaf</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                </NavLink>
+            </li>
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/Overview">
+                    <span class="bi bi-airplane-nav-menu" aria-hidden="true"></span> Overview
+                </NavLink>
+            </li>
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/airport/EKCH">
+                    <span class="bi bi-airplane-nav-menu" aria-hidden="true"></span> Airport EKCH
+                </NavLink>
+            </li>
+        </ul>
     </div>
-</div>
-
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/Overview">
-                <span class="bi bi-airplane-nav-menu" aria-hidden="true"></span> Overview
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/airport/EKCH">
-                <span class="bi bi-airplane-nav-menu" aria-hidden="true"></span> Airport EKCH
-            </NavLink>
-        </div>
-    </nav>
-</div>
-
+</nav>
