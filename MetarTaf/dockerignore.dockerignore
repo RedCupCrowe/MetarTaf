@@ -13,3 +13,4 @@
 **/*.jfm
 **/bin
 **/obj
+**/.Development.json
