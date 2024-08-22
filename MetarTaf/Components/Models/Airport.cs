@@ -170,7 +170,7 @@ namespace MetarTaf.Components.Models
 
                 if (taf != null)
                 {
-                    var tafTime = taf.time.dt; // Correctly parse the Dt string to DateTime
+                    var tafTime = taf?.time?.dt; // Correctly parse the Dt string to DateTime
                     if (!Tafs.ContainsKey((DateTime)tafTime))
                     {
                         AddTaf((DateTime)tafTime, taf);

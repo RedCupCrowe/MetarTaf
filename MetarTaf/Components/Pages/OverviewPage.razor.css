@@ -60,6 +60,10 @@
         height: 20px;
     }
 
+.clearall-button {
+    float: right;
+}
+
 .taf-new-report {
     background-color: red;
     border-top: 1px solid black;

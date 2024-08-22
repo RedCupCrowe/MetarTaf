@@ -20,18 +20,21 @@
         <button type="submit">Add Airport</button>
     </EditForm>
     <button @onclick="ConfirmAllReports">Confirm all</button>
-    <button @onclick="ClearAllAirports">Clear All Airports</button>
+    <button class="clearall-button" @onclick="@(async () => { if (await JSRuntime.InvokeAsync<bool>("confirmClearAllAirports")) { await ClearAllAirports(); } })">Clear All Airports</button>
 </div>
 
 @foreach (var airport in airports)
 {
+    
     var latestMetar = airport.Metars.OrderByDescending(m => m.Key).FirstOrDefault().Value;
     var latestTaf = airport.Tafs.OrderByDescending(t => t.Key).FirstOrDefault().Value;
 
     var metarTime = latestMetar?.Time?.Dt ?? DateTime.MinValue;
     var timeSinceLastMetar = currentTime - metarTime;
+
     var tafTime = latestTaf?.time?.dt ?? DateTime.MinValue;
     var timeSinceLastTAF = currentTime - tafTime;
+
 
     <div>
         <table class="table-parent">
@@ -46,7 +49,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="actions-cell" rowspan="2"> 
+                    <td class="actions-cell" rowspan="2">
                         <button @onclick="() => ConfirmReports(airport)">
                             ✔️
                         </button>
@@ -60,7 +63,7 @@
                                 @airport.Icao
                             </div>
                             <div class="station-city">
-                                @airport.Info.city
+                                @airport.Info?.city
                             </div>
                         </div>
                     </td>
@@ -109,3 +112,5 @@
         </table>
     </div>
 }
+
+
