@@ -39,14 +39,14 @@
                 <tr>
                     <th></th>
                     <th>Station</th>
-                    <th>Report time</th>
                     <th>Report type</th>
+                    <th>Report time</th>
                     <th>Raw report</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td class="actions-cell" rowspan="2">
+                    <td class="actions-cell" rowspan="2"> 
                         <button @onclick="() => ConfirmReports(airport)">
                             ✔️
                         </button>
@@ -60,11 +60,11 @@
 
                     @if (latestTaf != null)
                     {
-                        <td class="reports-time-cell @((airport.isNewTaf ? "taf-new-report" : "taf-old-report"))">
-                            @tafTime.ToString("HH:mm") (@timeSinceLastTAF.ToString(@"hh\:mm"))
-                        </td>
                         <td class="report-type-cell @((airport.isNewTaf ? "taf-new-report" : "taf-old-report"))">
                             TAF
+                        </td>
+                        <td class="reports-time-cell @((airport.isNewTaf ? "taf-new-report" : "taf-old-report"))">
+                            @tafTime.ToString("HH:mm") (@timeSinceLastTAF.ToString(@"hh\:mm"))
                         </td>
                         <td class="@((airport.isNewTaf ? "taf-new-report" : "taf-old-report"))">
                             @latestTaf.raw
@@ -81,11 +81,11 @@
                 <tr>
                     @if (latestMetar != null)
                     {
-                        <td class="reports-time-cell @((airport.isNewMetar ? "metar-new-report" : "metar-old-report"))">
-                            @metarTime.ToString("HH:mm") (@timeSinceLastMetar.ToString(@"hh\:mm"))
-                        </td>
                         <td class="report-type-cell @((airport.isNewMetar ? "metar-new-report" : "metar-old-report"))">
                             METAR
+                        </td>
+                        <td class="reports-time-cell @((airport.isNewMetar ? "metar-new-report" : "metar-old-report"))">
+                            @metarTime.ToString("HH:mm") (@timeSinceLastMetar.ToString(@"hh\:mm"))
                         </td>
                         <td class="@((airport.isNewMetar ? "metar-new-report" : "metar-old-report"))">
                             @latestMetar.Raw
@@ -93,8 +93,8 @@
                     }
                     else
                     {
-                        <td class="reports-time-cell">Loading...</td>
                         <td class="report-type-cell">METAR</td>
+                        <td class="reports-time-cell">Loading...</td>
                         <td class="metar-old-report">Loading...</td>
                     }
                 </tr>
