@@ -11,7 +11,7 @@
 <PageTitle>Airport overview</PageTitle>
 
 <div>
-    <p>Current time: @currentTime.ToString("yyyy-MM-dd HH:mm:ss")</p>
+    <p>Current time: @currentTime.ToString("yyyy-MM-dd HH:mm:ss")z</p>
 </div>
 
 <div class="top-menu">
@@ -20,18 +20,21 @@
         <button type="submit">Add Airport</button>
     </EditForm>
     <button @onclick="ConfirmAllReports">Confirm all</button>
-    <button @onclick="ClearAllAirports">Clear All Airports</button>
+    <button class="clearall-button" @onclick="@(async () => { if (await JSRuntime.InvokeAsync<bool>("confirmClearAllAirports")) { await ClearAllAirports(); } })">Clear All Airports</button>
 </div>
 
 @foreach (var airport in airports)
 {
+    
     var latestMetar = airport.Metars.OrderByDescending(m => m.Key).FirstOrDefault().Value;
     var latestTaf = airport.Tafs.OrderByDescending(t => t.Key).FirstOrDefault().Value;
 
     var metarTime = latestMetar?.Time?.Dt ?? DateTime.MinValue;
     var timeSinceLastMetar = currentTime - metarTime;
+
     var tafTime = latestTaf?.time?.dt ?? DateTime.MinValue;
     var timeSinceLastTAF = currentTime - tafTime;
+
 
     <div>
         <table class="table-parent">
@@ -39,8 +42,8 @@
                 <tr>
                     <th></th>
                     <th>Station</th>
-                    <th>Report time</th>
                     <th>Report type</th>
+                    <th>Report time</th>
                     <th>Raw report</th>
                 </tr>
             </thead>
@@ -55,16 +58,23 @@
                         </button>
                     </td>
                     <td class="station-cell" rowspan="2" @onclick="() => NavigateToAirportPage(airport.Icao)">
-                        @airport.Icao
+                        <div style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+                            <div>
+                                @airport.Icao
+                            </div>
+                            <div class="station-city">
+                                @airport.Info?.city
+                            </div>
+                        </div>
                     </td>
 
                     @if (latestTaf != null)
                     {
-                        <td class="reports-time-cell @((airport.isNewTaf ? "taf-new-report" : "taf-old-report"))">
-                            @tafTime.ToString("HH:mm") (@timeSinceLastTAF.ToString(@"hh\:mm"))
-                        </td>
                         <td class="report-type-cell @((airport.isNewTaf ? "taf-new-report" : "taf-old-report"))">
                             TAF
+                        </td>
+                        <td class="reports-time-cell @((airport.isNewTaf ? "taf-new-report" : "taf-old-report"))">
+                            @tafTime.ToString("HH:mm") (@timeSinceLastTAF.ToString(@"hh\:mm"))
                         </td>
                         <td class="@((airport.isNewTaf ? "taf-new-report" : "taf-old-report"))">
                             @latestTaf.raw
@@ -81,11 +91,11 @@
                 <tr>
                     @if (latestMetar != null)
                     {
-                        <td class="reports-time-cell @((airport.isNewMetar ? "metar-new-report" : "metar-old-report"))">
-                            @metarTime.ToString("HH:mm") (@timeSinceLastMetar.ToString(@"hh\:mm"))
-                        </td>
                         <td class="report-type-cell @((airport.isNewMetar ? "metar-new-report" : "metar-old-report"))">
                             METAR
+                        </td>
+                        <td class="reports-time-cell @((airport.isNewMetar ? "metar-new-report" : "metar-old-report"))">
+                            @metarTime.ToString("HH:mm") (@timeSinceLastMetar.ToString(@"hh\:mm"))
                         </td>
                         <td class="@((airport.isNewMetar ? "metar-new-report" : "metar-old-report"))">
                             @latestMetar.Raw
@@ -93,8 +103,8 @@
                     }
                     else
                     {
-                        <td class="reports-time-cell">Loading...</td>
                         <td class="report-type-cell">METAR</td>
+                        <td class="reports-time-cell">Loading...</td>
                         <td class="metar-old-report">Loading...</td>
                     }
                 </tr>
@@ -102,3 +112,5 @@
         </table>
     </div>
 }
+
+

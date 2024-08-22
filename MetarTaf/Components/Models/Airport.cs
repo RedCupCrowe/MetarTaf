@@ -61,9 +61,6 @@ namespace MetarTaf.Components.Models
             tafStorageFilePath = Path.Combine(tafsFolder, $"{icao}_tafs.json");
             infoStorageFilePath = Path.Combine(infoFolder, $"{icao}_info.json");
 
-            Console.WriteLine($"METAR storage file path: {metarStorageFilePath}");
-            Console.WriteLine($"TAF storage file path: {tafStorageFilePath}");
-            Console.WriteLine($"Info storage file path: {infoStorageFilePath}");
 
             LoadMetars();
             LoadTafs();
@@ -79,16 +76,16 @@ namespace MetarTaf.Components.Models
                 try
                 {
                     Directory.CreateDirectory(folderPath);
-                    Console.WriteLine($"Directory created: {folderPath}");
+                    Console.WriteLine($"[{Icao}] Directory created: {folderPath}");
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error creating directory: {ex.Message}");
+                    Console.WriteLine($"[{Icao}] Error creating directory: {ex.Message}");
                 }
             }
             else
             {
-                Console.WriteLine($"Directory already exists: {folderPath}");
+                Console.WriteLine($"[{Icao}] Directory already exists: {folderPath}");
             }
         }
 
@@ -102,7 +99,7 @@ namespace MetarTaf.Components.Models
 
         private async Task TimerCallback()
         {
-            Console.WriteLine("TimerCallback invoked");
+            Console.WriteLine($"[{Icao}] TimerCallback invoked");
             await FetchMetarAsync();
             await FetchTafAsync();
         }
@@ -111,7 +108,7 @@ namespace MetarTaf.Components.Models
         {
             try
             {
-                Console.WriteLine("FetchMetarAsync invoked");
+                Console.WriteLine($"[{Icao}] Fetching METAR");
 
                 if (metarService == null)
                 {
@@ -140,14 +137,16 @@ namespace MetarTaf.Components.Models
             }
             catch (HttpRequestException httpEx)
             {
-                Error = $"Error fetching data: {httpEx.Message}";
-                Console.WriteLine(Error);
+                Error = $"Error fetching METAR data: {httpEx.Message}";
+                Console.WriteLine($"[{Icao}] {Error}");
+                AirportFactory.ReleaseAirport(Icao);
                 NotifyStateChanged();
             }
             catch (Exception ex)
             {
-                Error = $"Error initializing data: {ex.Message}";
-                Console.WriteLine(Error);
+                Error = $"Error initializing METAR data: {ex.Message}";
+                Console.WriteLine($"[{Icao}] {Error}");
+
                 NotifyStateChanged();
             }
         }
@@ -156,7 +155,7 @@ namespace MetarTaf.Components.Models
         {
             try
             {
-                Console.WriteLine("FetchTafAsync invoked");
+                Console.WriteLine($"[{Icao}] Fetching TAF");
                 if (tafService == null)
                 {
                     throw new InvalidOperationException("tafService is not initialized.");
@@ -171,7 +170,7 @@ namespace MetarTaf.Components.Models
 
                 if (taf != null)
                 {
-                    var tafTime = taf.time.dt; // Correctly parse the Dt string to DateTime
+                    var tafTime = taf?.time?.dt; // Correctly parse the Dt string to DateTime
                     if (!Tafs.ContainsKey((DateTime)tafTime))
                     {
                         AddTaf((DateTime)tafTime, taf);
@@ -184,13 +183,14 @@ namespace MetarTaf.Components.Models
             catch (HttpRequestException httpEx)
             {
                 Error = $"Error fetching TAF data: {httpEx.Message}";
-                Console.WriteLine(Error);
+                Console.WriteLine($"[{Icao}] {Error}");
+                AirportFactory.ReleaseAirport(Icao);
                 NotifyStateChanged();
             }
             catch (Exception ex)
             {
                 Error = $"Error initializing TAF data: {ex.Message}";
-                Console.WriteLine(Error);
+                Console.WriteLine($"[{Icao}] {Error}");
                 NotifyStateChanged();
             }
         }
@@ -199,7 +199,7 @@ namespace MetarTaf.Components.Models
         {
             try
             {
-                Console.WriteLine("FetchAirportInfoAsync invoked");
+                Console.WriteLine($"[{Icao}] Fetching AirportInfo");
 
                 if (airportInfoService == null)
                 {
@@ -234,13 +234,14 @@ namespace MetarTaf.Components.Models
             catch (HttpRequestException httpEx)
             {
                 Error = $"Error fetching airport info: {httpEx.Message}";
-                Console.WriteLine(Error);
+                Console.WriteLine($"[{Icao}] {Error}");
+                AirportFactory.ReleaseAirport(Icao);
                 NotifyStateChanged();
             }
             catch (Exception ex)
             {
                 Error = $"Error initializing airport info: {ex.Message}";
-                Console.WriteLine(Error);
+                Console.WriteLine($"[{Icao}] {Error}");
                 NotifyStateChanged();
             }
         }
@@ -271,14 +272,14 @@ namespace MetarTaf.Components.Models
         {
             try
             {
-                Console.WriteLine("Saving metars to file...");
+                Console.WriteLine($"[{Icao}] Saving metars to file...");
                 var json = JsonSerializer.Serialize(Metars);
                 File.WriteAllText(metarStorageFilePath, json);
-                Console.WriteLine("Metars saved successfully.");
+                Console.WriteLine($"[{Icao}] Metars saved successfully.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error saving metars: {ex.Message}");
+                Console.WriteLine($"[{Icao}] Error saving metars: {ex.Message}");
             }
         }
 
@@ -286,14 +287,14 @@ namespace MetarTaf.Components.Models
         {
             try
             {
-                Console.WriteLine("Saving TAFs to file...");
+                Console.WriteLine($"[{Icao}] Saving TAFs to file...");
                 var json = JsonSerializer.Serialize(Tafs);
                 File.WriteAllText(tafStorageFilePath, json);
-                Console.WriteLine("TAFs saved successfully.");
+                Console.WriteLine($"[{Icao}] TAFs saved successfully.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error saving TAFs: {ex.Message}");
+                Console.WriteLine($"[{Icao}] Error saving TAFs: {ex.Message}");
             }
         }
 
@@ -303,7 +304,7 @@ namespace MetarTaf.Components.Models
             {
                 if (File.Exists(metarStorageFilePath))
                 {
-                    Console.WriteLine("Loading metars from file...");
+                    Console.WriteLine($"[{Icao}] Loading metars from file...");
                     var json = File.ReadAllText(metarStorageFilePath);
                     var loadedMetars = JsonSerializer.Deserialize<Dictionary<DateTime, Metar>>(json) ?? new Dictionary<DateTime, Metar>();
 
@@ -320,19 +321,19 @@ namespace MetarTaf.Components.Models
                             var lastMetarTime = recentMetars.Keys.Max();
                             if (now - lastMetarTime > TimeSpan.FromHours(12))
                             {
-                                Console.WriteLine("Last metar is older than 12 hours. Clearing metars.");
+                                Console.WriteLine($"[{Icao}] Last metar is older than 12 hours. Clearing metars.");
                                 Metars.Clear();
                                 File.Delete(metarStorageFilePath);
                             }
                             else
                             {
                                 Metars = recentMetars;
-                                Console.WriteLine("Metars loaded successfully.");
+                                Console.WriteLine($"[{Icao}] Metars loaded successfully.");
                             }
                         }
                         else
                         {
-                            Console.WriteLine("All metars are older than 12 hours. Clearing metars.");
+                            Console.WriteLine($"[{Icao}] All metars are older than 12 hours. Clearing metars.");
                             Metars.Clear();
                             File.Delete(metarStorageFilePath);
                         }
@@ -341,7 +342,7 @@ namespace MetarTaf.Components.Models
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error loading metars: {ex.Message}");
+                Console.WriteLine($"[{Icao}] Error loading metars: {ex.Message}");
                 Metars = new Dictionary<DateTime, Metar>();
             }
         }
@@ -352,7 +353,7 @@ namespace MetarTaf.Components.Models
             {
                 if (File.Exists(tafStorageFilePath))
                 {
-                    Console.WriteLine("Loading TAFs from file...");
+                    Console.WriteLine($"[{Icao}] Loading TAFs from file...");
                     var json = File.ReadAllText(tafStorageFilePath);
                     var loadedTafs = JsonSerializer.Deserialize<Dictionary<DateTime, TAF>>(json) ?? new Dictionary<DateTime, TAF>();
 
@@ -369,19 +370,19 @@ namespace MetarTaf.Components.Models
                             var lastTafTime = recentTafs.Keys.Max();
                             if (now - lastTafTime > TimeSpan.FromHours(12))
                             {
-                                Console.WriteLine("Last TAF is older than 12 hours. Clearing TAFs.");
+                                Console.WriteLine($"[{Icao}] Last TAF is older than 12 hours. Clearing TAFs.");
                                 Tafs.Clear();
                                 File.Delete(tafStorageFilePath);
                             }
                             else
                             {
                                 Tafs = recentTafs;
-                                Console.WriteLine("TAFs loaded successfully.");
+                                Console.WriteLine($"[{Icao}] TAFs loaded successfully.");
                             }
                         }
                         else
                         {
-                            Console.WriteLine("All TAFs are older than 12 hours. Clearing TAFs.");
+                            Console.WriteLine($"[{Icao}] All TAFs are older than 12 hours. Clearing TAFs.");
                             Tafs.Clear();
                             File.Delete(tafStorageFilePath);
                         }
@@ -390,7 +391,7 @@ namespace MetarTaf.Components.Models
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error loading TAFs: {ex.Message}");
+                Console.WriteLine($"[{Icao}] Error loading TAFs: {ex.Message}");
                 Tafs = new Dictionary<DateTime, TAF>();
             }
         }
