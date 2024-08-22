@@ -29,13 +29,15 @@ namespace MetarTaf.Components.Factories
                     var airport = new Airport(icao, metarService, tafService, airportInfoService);
                     airport.IncrementReferenceCount();
                     airports[icao] = airport;
+                    Console.WriteLine("[AirportFactory] Created new airport: " + icao);
                 }
                 else
                 {
                     airports[icao].IncrementReferenceCount();
+                    Console.WriteLine("[AirportFactory] Reused existing airport: " + icao);
                 }
 
-                Console.WriteLine("Factory stored airports: " + string.Join(", ", airports.Keys));
+                
 
                 return airports[icao];
             }
@@ -53,10 +55,11 @@ namespace MetarTaf.Components.Factories
                     {
                         airports[icao].Dispose();
                         airports.Remove(icao);
+                        Console.WriteLine("[AirportFactory] Removed airport: " + icao);
                     }
                 }
 
-                Console.WriteLine("Factory stored airports: " + string.Join(", ", airports.Keys));
+                
             }
         }
     }
