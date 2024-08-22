@@ -55,7 +55,14 @@
                         </button>
                     </td>
                     <td class="station-cell" rowspan="2" @onclick="() => NavigateToAirportPage(airport.Icao)">
-                        @airport.Icao
+                        <div style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+                            <div>
+                                @airport.Icao
+                            </div>
+                            <div class="station-city">
+                                @airport.Info.city
+                            </div>
+                        </div>
                     </td>
 
                     @if (latestTaf != null)

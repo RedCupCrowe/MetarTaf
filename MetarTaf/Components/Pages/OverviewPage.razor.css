@@ -32,9 +32,14 @@
     border: solid black 1px; 
 }
 
-    .station-cell:hover {
-        background-color: #0056b3; /* Darker background on hover */
-    }
+.station-city {
+    text-align: center;
+    font-size: 50%;
+}
+
+.station-cell:hover {
+    background-color: #0056b3; /* Darker background on hover */
+}
 
 .actions-cell {
     text-align: left;
