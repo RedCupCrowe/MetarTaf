@@ -137,14 +137,16 @@ namespace MetarTaf.Components.Models
             }
             catch (HttpRequestException httpEx)
             {
-                Error = $"Error fetching data: {httpEx.Message}";
+                Error = $"Error fetching METAR data: {httpEx.Message}";
                 Console.WriteLine($"[{Icao}] {Error}");
+                AirportFactory.ReleaseAirport(Icao);
                 NotifyStateChanged();
             }
             catch (Exception ex)
             {
-                Error = $"Error initializing data: {ex.Message}";
+                Error = $"Error initializing METAR data: {ex.Message}";
                 Console.WriteLine($"[{Icao}] {Error}");
+
                 NotifyStateChanged();
             }
         }
@@ -182,6 +184,7 @@ namespace MetarTaf.Components.Models
             {
                 Error = $"Error fetching TAF data: {httpEx.Message}";
                 Console.WriteLine($"[{Icao}] {Error}");
+                AirportFactory.ReleaseAirport(Icao);
                 NotifyStateChanged();
             }
             catch (Exception ex)
@@ -232,6 +235,7 @@ namespace MetarTaf.Components.Models
             {
                 Error = $"Error fetching airport info: {httpEx.Message}";
                 Console.WriteLine($"[{Icao}] {Error}");
+                AirportFactory.ReleaseAirport(Icao);
                 NotifyStateChanged();
             }
             catch (Exception ex)
