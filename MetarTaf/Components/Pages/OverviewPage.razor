@@ -20,6 +20,15 @@
         <button type="submit">Add Airport</button>
     </EditForm>
     <button @onclick="ConfirmAllReports">Confirm all</button>
+
+    <label>
+        <InputCheckbox @bind-Value="showNewTaf" /> Show TAF updates
+    </label>
+    <label>
+        <InputCheckbox @bind-Value="showNewMetar" /> Show METAR updates
+    </label>
+
+
     <button class="clearall-button" @onclick="@(async () => { if (await JSRuntime.InvokeAsync<bool>("confirmClearAllAirports")) { await ClearAllAirports(); } })">Clear All Airports</button>
 </div>
 
@@ -70,13 +79,13 @@
 
                     @if (latestTaf != null)
                     {
-                        <td class="report-type-cell @((airport.isNewTaf ? "taf-new-report" : "taf-old-report"))">
+                        <td class="report-type-cell @((airport.isNewTaf && showNewTaf ? "taf-new-report" : "taf-old-report"))">
                             TAF
                         </td>
-                        <td class="reports-time-cell @((airport.isNewTaf ? "taf-new-report" : "taf-old-report"))">
+                        <td class="reports-time-cell @((airport.isNewTaf && showNewTaf ? "taf-new-report" : "taf-old-report"))">
                             @tafTime.ToString("HH:mm") (@timeSinceLastTAF.ToString(@"hh\:mm"))
                         </td>
-                        <td class="@((airport.isNewTaf ? "taf-new-report" : "taf-old-report"))">
+                        <td class="@((airport.isNewTaf && showNewTaf ? "taf-new-report" : "taf-old-report"))">
                             @latestTaf.raw
                         </td>
                     }
@@ -91,13 +100,13 @@
                 <tr>
                     @if (latestMetar != null)
                     {
-                        <td class="report-type-cell @((airport.isNewMetar ? "metar-new-report" : "metar-old-report"))">
+                        <td class="report-type-cell @((airport.isNewMetar && showNewMetar ? "metar-new-report" : "metar-old-report"))">
                             METAR
                         </td>
-                        <td class="reports-time-cell @((airport.isNewMetar ? "metar-new-report" : "metar-old-report"))">
+                        <td class="reports-time-cell @((airport.isNewMetar && showNewMetar ? "metar-new-report" : "metar-old-report"))">
                             @metarTime.ToString("HH:mm") (@timeSinceLastMetar.ToString(@"hh\:mm"))
                         </td>
-                        <td class="@((airport.isNewMetar ? "metar-new-report" : "metar-old-report"))">
+                        <td class="@((airport.isNewMetar && showNewMetar ? "metar-new-report" : "metar-old-report"))">
                             @latestMetar.Raw
                         </td>
                     }

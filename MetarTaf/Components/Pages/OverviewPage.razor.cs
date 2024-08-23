@@ -14,6 +14,8 @@ namespace MetarTaf.Components.Pages
         private Timer? timer;
         private List<Airport> airports = new List<Airport>();
         private bool isInitialized = false;
+        private bool showNewTaf = true;
+        private bool showNewMetar = true;
 
         [Inject] private IJSRuntime JSRuntime { get; set; }
 
