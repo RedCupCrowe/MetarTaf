@@ -18,18 +18,22 @@
     <EditForm Model="newAirportModel" OnValidSubmit="AddAirport">
         <InputText @bind-Value="newAirportModel.Icao" placeholder="Enter ICAO code" @oninput="@(e => newAirportModel.Icao = e.Value?.ToString()?.ToUpper() ?? string.Empty)" />
         <button type="submit">Add Airport</button>
+        <button @onclick="ConfirmAllReports">Acknowledge all changes</button>
+        <button class="clearall-button" @onclick="@(async () => { if (await JSRuntime.InvokeAsync<bool>("confirmClearAllAirports")) { await ClearAllAirports(); } })">Clear All Airports</button>
+       
+        <div>
+            last acknowledge: @lastAcknowledgeTime.ToString("HH:mm:ss")
+        </div>
+
+        <label>
+            <InputCheckbox @bind-Value="showNewTaf" /> Show TAF updates
+        </label>
+        <label>
+            <InputCheckbox @bind-Value="showNewMetar" /> Show METAR updates
+        </label>
+
     </EditForm>
-    <button @onclick="ConfirmAllReports">Confirm all</button>
 
-    <label>
-        <InputCheckbox @bind-Value="showNewTaf" /> Show TAF updates
-    </label>
-    <label>
-        <InputCheckbox @bind-Value="showNewMetar" /> Show METAR updates
-    </label>
-
-
-    <button class="clearall-button" @onclick="@(async () => { if (await JSRuntime.InvokeAsync<bool>("confirmClearAllAirports")) { await ClearAllAirports(); } })">Clear All Airports</button>
 </div>
 
 @foreach (var airport in airports)

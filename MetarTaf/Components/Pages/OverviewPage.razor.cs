@@ -16,7 +16,7 @@ namespace MetarTaf.Components.Pages
         private bool isInitialized = false;
         private bool showNewTaf = true;
         private bool showNewMetar = true;
-
+        private DateTime lastAcknowledgeTime = DateTime.MinValue;
         [Inject] private IJSRuntime JSRuntime { get; set; }
 
 
@@ -42,6 +42,7 @@ namespace MetarTaf.Components.Pages
         private void UpdateCurrentTime(object? state)
         {
             currentTime = DateTime.UtcNow;
+            lastAcknowledgeTime = lastAcknowledgeTime.AddSeconds(1);
             InvokeAsync(StateHasChanged);
         }
 
@@ -173,6 +174,7 @@ namespace MetarTaf.Components.Pages
                 airport.MarkMetarAsOld();
                 airport.MarkTafAsOld();
             }
+            lastAcknowledgeTime = DateTime.MinValue;
             StateHasChanged();
         }
 
