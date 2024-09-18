@@ -50,8 +50,11 @@ namespace MetarTaf.Components.Pages
         {
             if (!string.IsNullOrEmpty(newAirportModel.Icao))
             {
+                string icaoToAdd = newAirportModel.Icao;
+                newAirportModel.Icao = String.Empty;
+
                 var placeholderAirport = new Airport(
-                    newAirportModel.Icao,
+                    icaoToAdd,
                     null, // Provide the required MetarService instance
                     null,   // Provide the required TAFService instance
                     null// Provide the required AirportInfoService instance
@@ -62,7 +65,7 @@ namespace MetarTaf.Components.Pages
 
                 try
                 {
-                    var airport = AirportFactory.GetAirport(newAirportModel.Icao);
+                    var airport = AirportFactory.GetAirport(icaoToAdd);
                     await airport.InitializeAsync();
 
                     // Check if the airport has valid data
@@ -87,13 +90,13 @@ namespace MetarTaf.Components.Pages
                 }
                 catch (HttpRequestException httpEx)
                 {
-                    Console.WriteLine($"Error fetching data for ICAO {newAirportModel.Icao}: {httpEx.Message}");
+                    Console.WriteLine($"Error fetching data for ICAO {icaoToAdd}: {httpEx.Message}");
                     airports.Remove(placeholderAirport);
                     StateHasChanged();
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Unexpected error for ICAO {newAirportModel.Icao}: {ex.Message}");
+                    Console.WriteLine($"Unexpected error for ICAO {icaoToAdd}: {ex.Message}");
                     airports.Remove(placeholderAirport);
                     StateHasChanged();
                 }
