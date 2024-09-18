@@ -8,7 +8,7 @@ namespace MetarTaf.Components.Factories
     public static class AirportFactory
     {
         private static readonly object lockObject = new object();
-        private static readonly Dictionary<string, Airport> airports = new Dictionary<string, Airport>();
+        public static readonly Dictionary<string, Airport> airports = new Dictionary<string, Airport>();
         private static MetarService metarService;
         private static TAFService tafService;
         private static AirportInfoService airportInfoService;
