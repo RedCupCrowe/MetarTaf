@@ -1,0 +1,30 @@
+﻿@page "/Developerpage"
+@rendermode InteractiveServer
+@using MetarTaf.Components.Factories;
+@using MetarTaf.Components.Models;
+
+<h3>Developer Page</h3>
+
+<div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ICAO</th>
+                <th>Airport Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var airportEntry in AirportFactory.airports)
+            {
+                <tr>
+                    <td>@airportEntry.Key</td> <!-- ICAO Code (key) -->
+                    <td>@airportEntry.Value.Info?.name</td> <!-- Airport object property (Name or any other) -->
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    // No additional C# code required for this specific loop
+}
