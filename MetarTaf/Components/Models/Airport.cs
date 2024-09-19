@@ -31,7 +31,7 @@ namespace MetarTaf.Components.Models
         private readonly string metarStorageFilePath;
         private readonly string tafStorageFilePath;
         private readonly string infoStorageFilePath;
-        private int referenceCount;
+        public int referenceCount { get; set; }
 
         // Delegate for notifying state changes
         public Action? OnStateChanged { get; set; }
