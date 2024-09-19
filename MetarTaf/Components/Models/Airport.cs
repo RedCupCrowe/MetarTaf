@@ -140,6 +140,8 @@ namespace MetarTaf.Components.Models
                 Error = $"Error fetching METAR data: {httpEx.Message}";
                 Console.WriteLine($"[{Icao}] {Error}");
                 AirportFactory.ReleaseAirport(Icao);
+                this.Dispose();
+                throw new ArgumentException($"[{Icao}] Is not valid!");
                 NotifyStateChanged();
             }
             catch (Exception ex)
@@ -185,6 +187,8 @@ namespace MetarTaf.Components.Models
                 Error = $"Error fetching TAF data: {httpEx.Message}";
                 Console.WriteLine($"[{Icao}] {Error}");
                 AirportFactory.ReleaseAirport(Icao);
+                this.Dispose();
+                throw new ArgumentException($"[{Icao}] Is not valid!");
                 NotifyStateChanged();
             }
             catch (Exception ex)
@@ -236,6 +240,8 @@ namespace MetarTaf.Components.Models
                 Error = $"Error fetching airport info: {httpEx.Message}";
                 Console.WriteLine($"[{Icao}] {Error}");
                 AirportFactory.ReleaseAirport(Icao);
+                this.Dispose();
+                throw new ArgumentException($"[{Icao}] Is not valid!");
                 NotifyStateChanged();
             }
             catch (Exception ex)
