@@ -1,0 +1,86 @@
+{
+  "2024-09-20T20:50:00Z": {
+    "Altimeter": {
+      "Repr": "Q1029",
+      "Spoken": "one zero two nine",
+      "Value": 1029
+    },
+    "Clouds": [
+    ],
+    "density_altitude": -565,
+    "Dewpoint": {
+      "Repr": "12",
+      "Spoken": "one two",
+      "Value": 12
+    },
+    "flight_rules": "VFR",
+    "Meta": {
+      "stations_updated": "2024-06-12",
+      "Timestamp": "2024-09-20T21:12:12.694672Z"
+    },
+    "Other": [
+    ],
+    "pressure_altitude": -449,
+    "Raw": "EKCH 202050Z AUTO 06004KT 9999 NCD 14/12 Q1029 NOSIG",
+    "relative_humidity": 0.8773959760472425,
+    "Remarks": "NOSIG",
+    "remarks_info": {
+      "Codes": [
+      ],
+      "dewpoint_decimal": null,
+      "maximum_temperature_24": null,
+      "maximum_temperature_6": null,
+      "minimum_temperature_24": null,
+      "minimum_temperature_6": null,
+      "precip_24_hours": null,
+      "precip_36_hours": null,
+      "precip_hourly": null,
+      "pressure_tendency": null,
+      "sea_level_pressure": null,
+      "snow_depth": null,
+      "sunshine_minutes": null,
+      "temperature_decimal": null
+    },
+    "runway_visibility": [
+    ],
+    "Sanitized": "EKCH 202050Z 06004KT 9999 14/12 Q1029 NOSIG",
+    "Station": "EKCH",
+    "Temperature": {
+      "Repr": "14",
+      "Spoken": "one four",
+      "Value": 14
+    },
+    "Time": {
+      "Dt": "2024-09-20T20:50:00Z",
+      "Repr": "202050Z"
+    },
+    "Units": {
+      "Accumulation": "in",
+      "Altimeter": "hPa",
+      "Altitude": "ft",
+      "Temperature": "C",
+      "Visibility": "m",
+      "wind_speed": "kt"
+    },
+    "Visibility": {
+      "Repr": "9999",
+      "Spoken": "nine nine nine nine",
+      "Value": 9999
+    },
+    "wind_direction": {
+      "Repr": "060",
+      "Spoken": "zero six zero",
+      "Value": 60
+    },
+    "wind_gust": null,
+    "wind_speed": {
+      "Repr": "04",
+      "Spoken": "four",
+      "Value": 4
+    },
+    "wind_variable_direction": [
+    ],
+    "wx_codes": [
+    ]
+  }
+}

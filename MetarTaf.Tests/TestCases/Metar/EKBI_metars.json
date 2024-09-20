@@ -1,0 +1,70 @@
+{
+  "2024-09-20T20:50:00Z": {
+    "Altimeter": {
+      "Repr": "Q1028",
+      "Spoken": "one zero two eight",
+      "Value": 1028
+    },
+    "Clouds": [
+    ],
+    "density_altitude": -251,
+    "Dewpoint": {
+      "Repr": "13",
+      "Spoken": "one three",
+      "Value": 13
+    },
+    "flight_rules": "MVFR",
+    "Meta": {
+      "stations_updated": "2024-06-12",
+      "Timestamp": "2024-09-20T21:12:07.908693Z"
+    },
+    "Other": [
+    ],
+    "pressure_altitude": -190,
+    "Raw": "EKBI 202050Z AUTO 07006KT 7000 NCD 14/13 Q1028",
+    "relative_humidity": 0.9369330286066342,
+    "Remarks": "",
+    "remarks_info": null,
+    "runway_visibility": [
+    ],
+    "Sanitized": "EKBI 202050Z 07006KT 7000 14/13 Q1028",
+    "Station": "EKBI",
+    "Temperature": {
+      "Repr": "14",
+      "Spoken": "one four",
+      "Value": 14
+    },
+    "Time": {
+      "Dt": "2024-09-20T20:50:00Z",
+      "Repr": "202050Z"
+    },
+    "Units": {
+      "Accumulation": "in",
+      "Altimeter": "hPa",
+      "Altitude": "ft",
+      "Temperature": "C",
+      "Visibility": "m",
+      "wind_speed": "kt"
+    },
+    "Visibility": {
+      "Repr": "7000",
+      "Spoken": "seven thousand",
+      "Value": 7000
+    },
+    "wind_direction": {
+      "Repr": "070",
+      "Spoken": "zero seven zero",
+      "Value": 70
+    },
+    "wind_gust": null,
+    "wind_speed": {
+      "Repr": "06",
+      "Spoken": "six",
+      "Value": 6
+    },
+    "wind_variable_direction": [
+    ],
+    "wx_codes": [
+    ]
+  }
+}

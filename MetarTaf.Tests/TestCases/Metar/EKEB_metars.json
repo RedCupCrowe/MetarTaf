@@ -1,0 +1,68 @@
+{
+  "altimeter": {
+    "repr": "Q1028",
+    "spoken": "one zero two eight",
+    "value": 1028
+  },
+  "clouds": [],
+  "density_altitude": -677,
+  "dewpoint": {
+    "repr": "12",
+    "spoken": "one two",
+    "value": 12
+  },
+  "flight_rules": "IFR",
+  "meta": {
+    "stations_updated": "2024-06-12",
+    "timestamp": "2024-09-20T21:45:47.994937Z"
+  },
+  "other": [],
+  "pressure_altitude": -340,
+  "raw": "EKEB 202120Z AUTO 03005KT 1800 BR NCD 12/12 Q1028",
+  "relative_humidity": 1,
+  "remarks": "",
+  "remarks_info": null,
+  "runway_visibility": [],
+  "sanitized": "EKEB 202120Z 03005KT 1800 BR 12/12 Q1028",
+  "station": "EKEB",
+  "temperature": {
+    "repr": "12",
+    "spoken": "one two",
+    "value": 12
+  },
+  "time": {
+    "dt": "2024-09-20T21:20:00Z",
+    "repr": "202120Z"
+  },
+  "units": {
+    "accumulation": "in",
+    "altimeter": "hPa",
+    "altitude": "ft",
+    "temperature": "C",
+    "visibility": "m",
+    "wind_speed": "kt"
+  },
+  "visibility": {
+    "repr": "1800",
+    "spoken": "one eight hundred",
+    "value": 1800
+  },
+  "wind_direction": {
+    "repr": "030",
+    "spoken": "zero three zero",
+    "value": 30
+  },
+  "wind_gust": null,
+  "wind_speed": {
+    "repr": "05",
+    "spoken": "five",
+    "value": 5
+  },
+  "wind_variable_direction": [],
+  "wx_codes": [
+    {
+      "repr": "BR",
+      "value": "Mist"
+    }
+  ]
+}
