@@ -53,6 +53,14 @@ namespace MetarTaf.Components.Pages
                 string icaoToAdd = newAirportModel.Icao;
                 newAirportModel.Icao = String.Empty;
 
+                // Check if an airport with the same ICAO code already exists in the list
+                var existingAirport = airports.FirstOrDefault(a => a.Icao == icaoToAdd);
+                if (existingAirport != null)
+                {
+                    Console.WriteLine($"Airport with ICAO {icaoToAdd} is already in the list.");
+                    return; // Exit the method if the airport is already in the list
+                }
+
                 var placeholderAirport = new Airport(
                     icaoToAdd,
                     null, // Provide the required MetarService instance
@@ -67,7 +75,7 @@ namespace MetarTaf.Components.Pages
                 {
                     var airport = AirportFactory.GetAirport(icaoToAdd);
                     await airport.InitializeAsync();
-
+                    
                     // Check if the airport has valid data
                     if (airport.Info != null && airport.Metars.Any() && airport.Tafs.Any())
                     {
